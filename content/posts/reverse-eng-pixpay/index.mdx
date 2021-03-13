@@ -5,19 +5,19 @@ image: ./pixpay.png
 imageAlt: Logo de PixPay.fr
 ---
 
-Bonjour à tous. Dans ce premier post sur ce blog, je vais détailler le reverse engineering de l'application PixPay, une néo-banque française.
+Bonjour à tous. Dans ce premier post sur ce blog, je vais détailler l'ingénierie inversée (reverse engineering) de l'application PixPay, une néo-banque française.
 
-Cet article me sert à la fois de notes dans le cas où j'aurais à faire un nouveau reverse engineering d'une application, et à la fois de tutoriel pour que vous puissiez (peut-être) apprendre quelques petites choses !
+Cet article me sert à la fois de notes dans le cas où j'aurais à faire de nouveau cela avec une  autreapplication, et à la fois de tutoriel pour que vous puissiez (peut-être) apprendre quelques petites choses !
 
-Dans ce post, j'utiliserai Charles Proxy, ProxyDroid, un Android 7.0 rooté (en fait un Samsung J3 2016 Android 5.0 avec une ROM Android 7.0) et Frida. 
+Dans ce post, j'utiliserai [Charles Proxy](https://charlesproxy.com), [ProxyDroid](https://play.google.com/store/apps/details?id=org.proxydroid), un Android 7.0 rooté (en fait un Samsung J3 2016 Android 5.0 avec une ROM Android 7.0) et [Frida](https://frida.re). 
 
 ## Reverse engineequoi ?
 
-Le reverse engineering consiste à étudier la façon dont a été conçue une application, souvent pour pouvoir automatiser certaines actions de l'application avec du code. Un petit exemple parlant, si on comprend comment fonctionne Instagram, on peut parvenir à publier automatiquement des posts avec un script.
+L'ingénierie inversée (reverse engineering en anglais) consiste à étudier la façon dont a été conçue une application, souvent pour pouvoir automatiser certaines actions de l'application avec du code. Un petit exemple parlant, si on comprend comment fonctionne Instagram, on peut parvenir à publier automatiquement des posts avec un script.
 
 ## Pourquoi avoir choisi PixPay ?
 
-Après avoir déjà fait un peu de reverse engineering avec l'application Pronote, je voulais me familiariser un peu avec Charles Proxy et tous ces outils. Intercepter les requêtes de l'application n'aurait du me prendre qu'une petite heure mais comme vous allez le voir, cela s'est avéré un peu plus ardu. J'ai choisi PixPay par curiosité pour ces "néo-banques" et parce que c'est une des seules qui n'a pas déjà été étudiée.
+Après avoir déjà fait un peu d'ingénierie inversée avec l'application Pronote, je voulais me familiariser un peu avec Charles Proxy et tous ces outils. Intercepter les requêtes de l'application n'aurait du me prendre qu'une petite heure mais comme vous allez le voir, cela s'est avéré un peu plus ardu. J'ai choisi PixPay par curiosité pour ces "néo-banques" et parce que c'est une des seules qui n'a pas déjà été étudiée.
 
 ## Intercepter les requêtes
 
@@ -32,22 +32,23 @@ Comme toutes les requêtes entre l'application et l'API sont interceptées, cela
 ## Lançons Charles Proxy
 
 Pour cela, j'ai décidé d'utiliser Charles Proxy, un logiciel qui nous permet de lancer un serveur proxy sur un ordinateur pour m'y connecter avec mon téléphone. Il y a de nombreux tutoriels sur Google, mais en résumé :
-* téléchargez Charles sur https://www.charlesproxy.com/
+* téléchargez Charles sur https://www.charlesproxy.com/ (de nombreux cracks existent, sinon $20 à vie)
 * lancez Charles
 * dans les paramètres Wifi de votre téléphone, configurer un proxy avec comme `host` l'adresse IP locale de votre ordinateur et comme pot `8888`
+* dans les paramètres de Charles > SSL Proxying, ajoutez un domaine `*`.
 * ouvrez un navigateur et tapez `https://chls.pro/ssl` pour télécharger le certificat SSL de Charles puis installez-le sur votre téléphone (en cliquant sur le fichier téléchargé)
 
 Une fois Charles et votre téléphone configurés, vous pouvez essayer de faire une recherche Google, vous verrez que celle-ci apparaitra dans Charles.
 
 ![charles](./charles-google.png)
 
-## Flutter, le framework Android... qui ne suit pas les paramètres Android
+## [Flutter](http://flutter.dev/), le framework Android... qui ne suit pas les paramètres Android
 
-Voilà, maintenant je devrais pouvoir lancer PixPay et voir les requêtes ! Sauf que... non. Je lance PixPay et **aucune** requête à l'API ne s'affiche. Pas d'erreur, rien n'est juste affiché dans Charles. La réponse, que j'ai fini par trouver après un moment : PixPay utilise **Flutter**, un framework de développement pour applications Android (que j'ai d'ailleurs utilisé pour mon appli [Notifications pour Pronote](https://github.com/pronote-notifications/pronote-notifications-app)). Et ce framework n'utilise pas le proxy configuré dans les paramètres Wifi du téléphone. Génial.
+Voilà, maintenant je devrais pouvoir lancer PixPay et voir les requêtes ! Sauf que... non. Je lance PixPay et **aucune** requête à l'API ne s'affiche. Pas d'erreur, rien n'est juste affiché dans Charles. La réponse, que j'ai fini par trouver après un moment : PixPay utilise **[Flutter](http://flutter.dev/)**, un framework de développement pour applications Android (que j'ai d'ailleurs utilisé pour mon appli [Notifications pour Pronote](https://github.com/pronote-notifications/pronote-notifications-app)). Et ce framework n'utilise pas le proxy configuré dans les paramètres Wifi du téléphone. Génial.
 
 ## Forcer l'utilisation de notre proxy
 
-Pour palier à ce problème, j'ai utilisé ProxyDroid. C'est une application qui vous permet de forcer l'utilisation d'un proxy sur le téléphone. Évidemment, cette appli a besoin du root pour fonctionner. Une semaine plus tard, je récupère un vieux Samsung S4 Mini (Android 4) que j'avais rooté. J'essaye de faire l'installation avec ADB et... ça ne fonctionne pas. L'application nécessite Android 5 pour fonctionner. Je récupère donc un vieux Samsung J3 2016. Il ne reste plus qu'à le rooter... Je vous passe les détails mais après quelques heures passées en vocal avec [@kaki87](https://kaki87.net), que je re-remercie infiniment, mon J3 est rooté avec Magisk et XPosed (et une ROM custom, resurrection remix, sous Android 7).
+Pour palier à ce problème, j'ai utilisé ProxyDroid. C'est une application qui vous permet de forcer l'utilisation d'un proxy sur le téléphone. Évidemment, cette appli a besoin du root pour fonctionner. Une semaine plus tard, je récupère un vieux Samsung S4 Mini (Android 4) que j'avais rooté. J'essaye de faire l'installation avec ADB et... ça ne fonctionne pas. L'application nécessite Android 5 pour fonctionner. Je récupère donc un vieux Samsung J3 2016. Il ne reste plus qu'à le rooter... Je vous passe les détails mais après quelques heures passées en vocal avec [@kaki87](https://github.com/kaki87), que je re-remercie infiniment, mon J3 est rooté avec Magisk et XPosed (et une ROM custom, resurrection remix, sous Android 7).
 
 ## SSL handshake failed.
 
@@ -121,4 +122,4 @@ Toutes les autres requêtes fonctionnent avec GraphQL et l'endpoint `https://pro
 Il ne me reste plus qu'à créer un compte, mettre quelques euros dessus et créer une petite lib JS pour le fun en implémentant les endpoints principaux.
 La librairie finale est disponible sur **[GitHub](https://github.com/Androz2091/pixpay-api)**!
 
-Merci d'avoir lu jusqu'ici et j'espère que ce post aura pu vous en apprendre un peu plus sur le reverse engineering, des applications Flutter notamment! Je remercie encore une fois [Kaki87](https://kaki87.net) qui m'a beaucoup aidé ainsi que l'auteur du script Frida, [Jeroen Beckers](https://blog.nviso.eu/author/dauntless/).
+Merci d'avoir lu jusqu'ici et j'espère que ce post aura pu vous en apprendre un peu plus sur l'ingénierie inversée, des applications Flutter notamment! Je remercie encore une fois [Kaki87](https://github.com/kaki87) qui m'a beaucoup aidé ainsi que l'auteur du script Frida, [Jeroen Beckers](https://blog.nviso.eu/author/dauntless/).
