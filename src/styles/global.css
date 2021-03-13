@@ -6,3 +6,6 @@ body {
     font-size: 10px !important;
 }
 
+a[href="#reach-skip-nav"] {
+    background-color: transparent !important;
+}
