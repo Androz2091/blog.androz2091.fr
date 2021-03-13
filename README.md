@@ -4,7 +4,7 @@
 
 ## Contributions
 
-If you found a typo or an error in the post, you can submit a pull request. The files containing the post contents are located in the `content` folder. Each post has a `.mdx` file containing its metadata and its content.
+If you found a typo or an error in the post, you can submit a pull request. The files containing the content of the posts are located in the `content` folder. Each post has a `.mdx` file containing its metadata and its content.
 
 ## Installation
 
