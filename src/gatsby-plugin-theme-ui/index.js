@@ -1,8 +1,4 @@
-/*
- * Want to change your theme colors?
- * Try uncommenting the color overrides below
- * to go from default purple to a blue theme
- */
+import "../styles/global.css"
 
 const darkBlue = `#007acc`
 const lightBlue = `#66E0FF`
@@ -12,6 +8,6 @@ export default {
     colors: {
         text: blueGray,
         primary: darkBlue,
-        heading: blueGray,
+        heading: lightBlue,
     },
 }
