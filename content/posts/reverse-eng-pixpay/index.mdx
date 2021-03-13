@@ -42,7 +42,7 @@ Une fois Charles et votre téléphone configurés, vous pouvez essayer de faire 
 
 ![charles](./charles-google.png)
 
-## [Flutter](http://flutter.dev/), le framework Android... qui ne suit pas les paramètres Android
+## Flutter, le framework Android... qui ne suit pas les paramètres Android
 
 Voilà, maintenant je devrais pouvoir lancer PixPay et voir les requêtes ! Sauf que... non. Je lance PixPay et **aucune** requête à l'API ne s'affiche. Pas d'erreur, rien n'est juste affiché dans Charles. La réponse, que j'ai fini par trouver après un moment : PixPay utilise **[Flutter](http://flutter.dev/)**, un framework de développement pour applications Android (que j'ai d'ailleurs utilisé pour mon appli [Notifications pour Pronote](https://github.com/pronote-notifications/pronote-notifications-app)). Et ce framework n'utilise pas le proxy configuré dans les paramètres Wifi du téléphone. Génial.
 
