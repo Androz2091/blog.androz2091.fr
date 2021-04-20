@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Styled } from "theme-ui"
+import { Themed } from "theme-ui"
 
 export default function PostDate (props) {
 
@@ -16,7 +16,7 @@ export default function PostDate (props) {
 
     return (
         <>
-        <Styled.p
+        <Themed.p
             style={{ display: 'inline' }}
             sx={{
             fontSize: 1,
