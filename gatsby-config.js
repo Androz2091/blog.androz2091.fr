@@ -11,7 +11,7 @@ module.exports = {
     title: `Androz2091's Blog`,
     author: `Androz2091`,
     siteUrl: 'https://blog.androz2091.fr',
-    description: 'Hey! I\'m Androz2091, and this is my blog. I sometimes find interesting things and write them here. I usually write in French but I might write in English in the future.',
+    description: 'Hey! Je suis Androz2091, bienvenue sur mon blog. Je trouve parfois des choses intéressantes et je les écris ici. J\'écris habituellement en français mais je pourrais écrire en anglais à l\'avenir.',
     social: [
       {
         name: `Twitter`,
