@@ -40,7 +40,7 @@ Une carte NFC Mifare, c'est une puce qui stocke des chiffres (au format hexadéc
 
 ### Blocks d'authentification
 
-Seulement, comme vous pouvez le voir sur la capture d'écran, chaque secteur dispose en réalité d'un **4ème block**, qui sert à protéger les données du secteur. Celui-ci stocke u**ne clef A** et **une clef B**, auxquelles nous n'avons pas accès facilement. Et sans celles-ci, impossible d'accéder aux 3 autres blocks.
+Seulement, comme vous pouvez le voir sur la capture d'écran, chaque secteur dispose en réalité d'un **4ème block**, qui sert à protéger les données du secteur. Celui-ci stocke **une clef A** et **une clef B**, auxquelles nous n'avons pas accès facilement. Et sans celles-ci, impossible d'accéder aux 3 autres blocks.
 
 Or, [en 2008, a été découverte une faille](https://fr.wikipedia.org/wiki/Mifare#S%C3%A9curit%C3%A9) pour tenter trouver les clefs d'une carte Mifare sans être un lecteur approuvé. C'est ce que tente de faire Mifare Classic Tool.
 
@@ -102,13 +102,13 @@ Des copies de Mifare de bonnes qualités sont disponibles sur le site de [L'atel
 
 ![L'atelier du geek](./latelierdugeek.png)
 
-Il faut d'abord lire la carte chinoise pour récupérer les clefs A et B qui me permettront de modifier ses blocs. Un simple `mfoc -O cart-vierge.mfd` suffit, car les clefs par défaut de la carte chinoise sont toutes égales à `ffffffffffff` par défaut.
+Il faut d'abord lire la carte chinoise pour récupérer les clefs A et B qui me permettront de modifier ses blocs. Un simple `mfoc -O carte-vierge.mfd` suffit, car les clefs par défaut de la carte chinoise sont toutes égales à `ffffffffffff` par défaut.
 
 Pour écrire sur la carte chinoise, j'essaie d'abord d'utiliser la commande `nfc-mfclassic`, avec les options basiques, `W` pour écrire les 16 secteurs, et `a` pour afficher les erreurs s'il y en a.
 
 ![nfc-mfclassic](./nfc-mfclassic-1.png)
 
-Aucune erreur, tout semble parfaitement fonctionner... mais en lisant de nouveau la carte chinoise, les données ne sont pas les bonnes. 🥲
+Aucune erreur, tout semble parfaitement fonctionner... mais en lisant de nouveau la carte chinoise, les données ne sont pas les bonnes (les données ne sont pas égales à la carte originale). 🥲
 
 Après une longue soirée à passer à debugger et à chercher, je découvre enfin où est le problème. La commande qui fonctionne est en fait `nfc-mfclassic W a u carte-cantine-originale.mfd carte-vierge.mfd f`.
 
@@ -117,7 +117,7 @@ L'utilisation du paramètre `u` permet de confirmer que nfc-mfclassic doit utili
 
 Et voilà !
 
-Le lendemain, un test suffit à me confirmer que tout fonctionne correctement.
+Dans la journée, un test avec la copie chinoise suffit à me confirmer que tout fonctionne correctement, le tourniquet de la cantine n'y voit que du feu 🔥
 
 ## Merci <3
 
