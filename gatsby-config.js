@@ -1,6 +1,6 @@
 module.exports = {
   plugins: [
-    `gatsby-theme-blog-darkmode`,
+    //`gatsby-theme-blog-darkmode`, -- does not work with new versions of gatsby
     {
       resolve: `gatsby-theme-blog`,
       options: {},
