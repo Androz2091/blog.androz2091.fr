@@ -19,13 +19,22 @@ export default function PostDate (props) {
         <Themed.p
             style={{ display: 'inline' }}
             sx={{
-            fontSize: 1,
-            mt: -3,
-            mb: 3,
+                fontSize: 1,
+                mt: -3,
+                mb: 3,
             }}
             {...props}
         />
-        <p style={{ display: 'inline' }}> • {views} views</p>
+        <Themed.p
+            style={{ display: 'inline' }}
+            sx={{
+                fontSize: 1,
+                mt: -3,
+                mb: 3,
+            }}
+            {...props}>
+            &nbsp;• {views} views
+        </Themed.p>
         </>
     )
 }
