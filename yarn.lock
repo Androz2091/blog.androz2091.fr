@@ -6685,14 +6685,6 @@ gatsby-theme-blog-core@^4.0.0:
     gatsby-transformer-sharp "^4.3.0"
     remark-slug "^5.1.2"
 
-gatsby-theme-blog-darkmode@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/gatsby-theme-blog-darkmode/-/gatsby-theme-blog-darkmode-4.0.0.tgz#329924584b6a27c1ee01123170afee241fb25bd5"
-  integrity sha512-7IWo02lgsxlxqmRx8N9qWi4H8Hj/lMhMAT9Sa64nP9VgNnCrs50S8utwAk9e4wgjB9kl5aEf9lbAlS5d6adN1Q==
-  dependencies:
-    "@reach/skip-nav" "^0.16.0"
-    react-switch "^6.0.0"
-
 gatsby-theme-blog@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/gatsby-theme-blog/-/gatsby-theme-blog-4.0.0.tgz#dae5e56618907799257d194844291502a44f856a"
@@ -10271,13 +10263,6 @@ react-side-effect@^2.1.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/react-side-effect/-/react-side-effect-2.1.1.tgz#66c5701c3e7560ab4822a4ee2742dee215d72eb3"
   integrity sha512-2FoTQzRNTncBVtnzxFOk2mCpcfxQpenBMbk5kSVBg5UcPqV9fRbgY2zhb7GTWWOlpFmAxhClBDlIq8Rsubz1yQ==
-
-react-switch@^6.0.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/react-switch/-/react-switch-6.1.0.tgz#46239535820f6cf1331aecd948ba585d8a7b532a"
-  integrity sha512-cOwQkxtHCOGtoK0KN3kZBPTQjt8P1TTpaor+TS0AJRLfFBIRkgjVIUCwAfvVlW32Bi1BK333rk9y/14suD38SA==
-  dependencies:
-    prop-types "^15.7.2"
 
 react@^18.1.0:
   version "18.1.0"
