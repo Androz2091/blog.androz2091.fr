@@ -3,14 +3,22 @@ import { Themed } from "theme-ui"
 
 export default function PostDate (props) {
 
-    const [views, setViews] = useState('...');
+    const [viewsContent, setViewsContent] = useState('...');
 
     useEffect(() => {
+        const abortController = new AbortController();
+        setTimeout(() => {
+            abortController.abort();
+        }, 2000);
         const [,postName] = window.location.href.match(/\/([a-zA-Z-0-9]+)\//);
-        fetch(`https://api.countapi.xyz/hit/blog-androz2091/${postName}`).then((res) => {
+        fetch(`https://api.countapi.xyz/hit/blog-androz2091/${postName}`, {
+            signal: abortController.signal
+        }).then((res) => {
             res.json().then((data) => {
-                setViews(data.value);
+                setViewsContent(data.value);
             });
+        }).catch(() => {
+            setViewsContent('API is offline (views can not be retrieved)');
         });
     }, [])
 
@@ -33,7 +41,7 @@ export default function PostDate (props) {
                 mb: 3,
             }}
             {...props}>
-            &nbsp;• {views} views
+            &nbsp;• {viewsContent}
         </Themed.p>
         </>
     )
