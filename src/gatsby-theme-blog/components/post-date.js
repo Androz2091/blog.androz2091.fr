@@ -24,6 +24,7 @@ export default function PostDate (props) {
 
     return (
         <>
+        <script async defer data-website-id="c7374106-e054-4215-b618-2814e7f85f2a" src="https://analytics.androz2091.fr/umami.js"></script>
         <Themed.p
             style={{ display: 'inline' }}
             sx={{
