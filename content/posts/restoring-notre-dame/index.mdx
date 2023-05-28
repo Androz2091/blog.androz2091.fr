@@ -66,7 +66,7 @@ Il faut donc réaliser énormément de calculs pour vérifier la distance entre 
 
 ## Comment optimiser ces calculs ?
 
-Il est donc possible d’optimiser ces calculs en utilisant des approximations pour simplifier les calculs. L'idée est de créer des “boîtes” pour englober les polyèdres. Ces boîtes sont des formes géométriques simples, comme des parallélépipèdes ou des sphères. En calculant la distance entre un point et la boîte, on obtient une approximation de la distance entre le point et le polyèdre.
+Il est donc possible d’optimiser ces calculs en utilisant des approximations pour réduire leur nombre. L'idée est de créer des “boîtes” pour englober les polyèdres. Ces boîtes sont des formes géométriques simples, comme des parallélépipèdes ou des sphères. En calculant la distance entre un point et la boîte, on obtient une approximation de la distance entre le point et le polyèdre.
 
 Si un point est loin de toutes les “boîtes”, on s’épargne des calculs complexes, c’est un point qui devra être de toute façon être signalé. Si un point est par contre proche d’une boîte, il faudra réaliser les calculs complexes évoqués plus haut pour vérifier la distance exacte entre le point et le polyèdre et savoir s’il faut le signaler ou non.
 
