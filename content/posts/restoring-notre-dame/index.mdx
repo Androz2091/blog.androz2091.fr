@@ -12,7 +12,8 @@ imageAlt: Notre Dame (image by Wikipedia)
 <!--ts-->
    * [Introduction](#introduction)
     * [Les techniques de réalisation de relevés en 3D](#les-techniques-de-réalisation-de-relevés-en-3d)
-    * [La nécessité de nettoyer le nuage de points](#la-nécessité-de-nettoyer-le-nuage-de-points)
+    * [Comment sont utilisés ces relevés ?](#comment-sont-utilisés-ces-relevés-)
+    * [L'intérêt d'un logiciel de traitement de nuage de points](#lintérêt-dun-logiciel-de-traitement-de-nuage-de-points)
     * [Comment réaliser ces calculs ?](#comment-réaliser-ces-calculs-)
     * [Comment optimiser ces calculs ?](#comment-optimiser-ces-calculs-)
     * [Conclusion](#conclusion)
@@ -20,42 +21,51 @@ imageAlt: Notre Dame (image by Wikipedia)
 
 ## Introduction
 
-Il y a 4 ans a débuté la reconstruction de la cathédrale Notre-Dame de Paris. C'est un enjeu important, et nous pouvons nous demander comment les erreurs, les oublis, ont pu être évités. Nous allons étudier comment ce chantier a bénéficié de l’aide précieuse d’outils de modélisation 3D et quels sont les défis mathématiques derrière cette technologie.
+Il y a 4 ans a débuté la reconstruction de la cathédrale Notre-Dame de Paris après son incendie. Cette opération a été lancée très rapidement par Emmanuel Macron, avec pour objectif de retrouver toute la prestance de ce monument avant les Jeux Olympiques de Paris 2024.
 
-En premier lieu, intéressons-nous au **processus classique** pour sauvegarder une version 3D d’un bâtiment, et l’utiliser si une reconstruction est nécessaire.
+Mais alors, **comment a-t-on pu reconstruire le monument avec une telle précision malgré cette contrainte de temps ?**
 
-Il faut d’abord **relever la topographie du bâtiment,** à chaque changement important.
+En France, les sites du patrimoine les plus précieux ou menacés sont régulièrement scannés en 3D. Dans le cas de Notre-Dame, c'est une entreprise toulousaine, Life 3D, qui a été chargée en 2019 de réaliser ces relevés.  
 
-En cas de destruction du bâtiment, les plans de reconstruction seront comparés avec les précédents relevés pour être certain qu’il n’y a pas eu **d’oubli ou d’anomalie**. 
+La principale utilité de ces relevés est de **faire une copie** virtuelle du monument, qui servira si une reconstruction est nécessaire. 
 
-Il y a donc un travail de **comparaison à réaliser, entre les nuages de points des relevés et les plans de reconstruction constitués de polyèdres**.
+Dans un premier temps, nous allons étudier les techniques de réalisation de relevés en 3D, puis nous verrons comment ces relevés (qui sont en fait des nuages de points) sont exploités par les architectes, en présentant les calculs et les optimisations utilisés par les logiciels de modélisation 3D.
 
 ## Les techniques de réalisation de relevés en 3D
 
-C’est donc ce qui a été fait avec Notre-Dame. Avant l’incendie, des relevés de nuages de points en trois dimensions ont été réalisés. 
+Commençont d'abord par étudier comment sont réalisés les relevés en trois dimensions des monuments, comme l'a fait Life 3D pour Notre-Dame.
 
-Pour cela, c’est **la lasergrammétrie **qui a été choisie. Celle-ci fonctionne avec la technologie LIDAR, qui est aussi utilisée sur les voitures autonomes. Elle consiste à balayer une surface avec un laser pour mesurer des distances et des angles.
+Ici, c'est **la lasergrammétrie **qui a été choisie. Celle-ci fonctionne avec la technologie LIDAR, qui est aussi utilisée sur les voitures autonomes. Elle consiste à balayer une surface avec un laser pour mesurer des distances.
 
-Celle-ci possède plusieurs avantages :
-* méthode très précise
-* très rapide
-* permet de traverser la végétation
-* fonctionne en faible luminosité
-* mais c’est très cher à la fois pour relever les données, et pour les exploiter (génère des données très complexes)
+C'est une méthode très précise, très rapide, qui permet de traverser la végétation et qui fonctionne en faible luminosité.
 
-C’est ainsi qu’on a pu sauvegarder une morphologie précise de la cathédrale avant l’incendie.
+D'autres techniques existent cependant comme la photogrammétrie, moins coûteuse et plus rapide.
 
-## La nécessité de nettoyer le nuage de points
+En fin de compte, on obtient donc un nuage de points du monument, à partir duquel on peut déterminer la morphologie précise de celui-ci.
 
-Lorsque celui-ci a eu lieu, de nouveaux architectes ont travaillé sur des plans de reconstruction en 3D, constitués de polyèdres, tout en effectuant un travail de comparaison des nuages de points relevés avant l’incendie avec les nouvelles modélisations.
+## Comment sont utilisés ces relevés ?
 
-Par exemple, si on se rend compte que quelques points s’écartent de la modélisation, il faut vérifier si ce n’est pas un ornement, comme une gargouille qui a été oubliée. La cathédrale de Notre-Dame présentant une architecture gothique riche en détails, les nuages de points relevés avant l’incendie sont particulièrement utiles.
+Lorsque l'incendie de Notre-Dame a eu lieu, les architectes ont commencé la phase de reconstitution des plans. Pour cela, ils se sont basés sur ces nuages de points, en les important dans leur logiciel pour s'en servir de modèle.
+
+C'est un peu comme dessiner sur du papier calque, on dispose d'une version du monument pas tout à fait propre dessous, et on veut refaire un dessin parfait. Par exemple si un pigeon se trouvait sur le toit, il sera présent sur le nuage de points, et il faudra évidemment qu'il n'apparaisse pas sur les plans de reconstruction.
+
+Les architectes vont donc analyser les relevés, et par exemple s'ils repèrent un mur en nuage de points, ils vont le modéliser proprement à l'aide de polyèdres (des polygones en trois dimensions).
+
+## L'intérêt d'un logiciel de traitement de nuage de points
+
+L'intérêt d'un logiciel un peu poussé est de pouvoir, une fois que l'on a modélisé les polyèdres principaux (les murs, les toits, les fenêtres, les portes), mettre en évidence les plus petits groupes de points qui ne sont pas encore modélisés.
+
+Par exemple, si on se rend compte qu'un groupe de points s’écartent d'un mur, il faut vérifier si ce n’est pas un ornement, comme une gargouille qui a été oubliée. La cathédrale de Notre-Dame présentant une architecture gothique riche en détails, il y a un très grand nombre de points à vérifier.
 
 ## Comment réaliser ces calculs ?
 
-Il s’agit donc de calculer la distance entre les points du nuage et les polyèdres. 
+Heureusement, il s'agit de calculs que l'on peut automatiser. Ce sont en fait des calculs de distance entre les points du nuage et les polyèdres déjà modélisés. Si la distance est inférieure à un certain seuil, on considère que le point appartient au polyèdre.
 
-Ici, le problème est plus complexe que le calcul d’une distance entre un point et un plan infini, comme nous pouvons le faire en utilisant le projeté orthogonal du point sur le plan. Lorsqu’on souhaite calculer la distance entre un point et un polyèdre, il faut en fait calculer la distance entre un point et plusieurs faces finies.
+Par exemple si on définit 5mm comme valeur seuil et qu'un point est à 4mm d'un mur modélisé en 3D, on considère qu'il appartient au mur. Si à l'inverse un point est à 8mm d'un mur, il faut que le logiciel le signale à l'architecte pour vérifier qu'il ne s'agit pas d'un oubli dans la modélisation.
+
+Mais alors, **comment calculer cette distance ?**
+
+Le problème est plus complexe que le calcul d’une distance entre un point et un plan infini, comme nous pouvons le faire en utilisant le projeté orthogonal du point sur le plan. Lorsqu’on souhaite calculer la distance entre un point et un polyèdre, il faut en fait calculer la distance entre un point et plusieurs faces finies.
 
 Par exemple, prenons le point A de l’angle de la salle et la face formée par la table. Pour calculer la distance entre les deux, il faut d’abord trouver le projeté orthogonal que l’on appellera B du point A sur le plan infini qui serait formé par la table.
 
@@ -66,17 +76,15 @@ Il faut donc réaliser énormément de calculs pour vérifier la distance entre 
 
 ## Comment optimiser ces calculs ?
 
-Il est donc possible d’optimiser ces calculs en utilisant des approximations pour réduire leur nombre. L'idée est de créer des “boîtes” pour englober les polyèdres. Ces boîtes sont des formes géométriques simples, comme des parallélépipèdes ou des sphères. En calculant la distance entre un point et la boîte, on obtient une approximation de la distance entre le point et le polyèdre.
+Il est possible d’optimiser ces calculs en utilisant des approximations pour réduire leur nombre. L'idée est de créer des “boîtes” qui vont englober les polyèdres de formes géométriques simples, comme des parallélépipèdes ou des sphères. En calculant la distance entre un point et la boîte, on obtient une approximation de la distance entre le point et le polyèdre.
 
 Si un point est loin de toutes les “boîtes”, on s’épargne des calculs complexes, c’est un point qui devra être de toute façon être signalé. Si un point est par contre proche d’une boîte, il faudra réaliser les calculs complexes évoqués plus haut pour vérifier la distance exacte entre le point et le polyèdre et savoir s’il faut le signaler ou non.
 
 ## Conclusion
 
-En conclusion, si nous pouvons aujourd’hui admirer une cathédrale identique à l’originale avant l’incendie, c’est en grande partie grâce au travail de comparaison des relevés réalisés par lasergrammétrie et des nouveaux plans de reconstruction.
+En conclusion, si nous pourrons admirer une cathédrale presque identique à l’originale avant l’incendie pendant les J.O. de Paris 2024, c’est en grande partie grâce à ces logiciels de traitement de nuage de points.
 
-Ces calculs effectués sur les nuages de points et les polyèdres sont très coûteux en performance car très nombreux. Il est donc possible de les optimiser à l’aide d’approximation des polyèdres.
-
-Il existe d’autres méthodes utilisées pour relever la morphologie des bâtiments, mais on revient systématiquement à ces mêmes calculs de distance.
+Les calculs effectués sur ces nuages et les polyèdres sont très coûteux en performance car très nombreux. Il est donc possible de les optimiser à l’aide d’approximation des polyèdres.
 
 ## Questions fréquentes
 
@@ -91,3 +99,11 @@ Il existe d’autres méthodes utilisées pour relever la morphologie des bâtim
 **Plus d’informations sur la façon dont sont construits les plans de reconstruction ?**
 
 → modélisation 3D avec technologie BIM, qui inclut également des informations détaillées sur les matériaux utilisés, les caractéristiques structurelles, et même les coûts et les délais de construction à partir des relevés.
+
+**Autre utilité des scans 3D?**
+
+→ les experts parviennent parfois à détecter des défauts de conception ou des faiblesses structurelles
+
+**Photogrammétrie vs lasergrammétrie ?**
+
+→ photogrammétrie : on prend des photos, on les assemble, on obtient un nuage de points. On peut aussi utiliser des drones pour prendre des photos de l’extérieur d’un bâtiment. C’est une technique moins précise que la lasergrammétrie, mais en général plus rapide et moins coûteuse. Sonar = ondes acoustiques. Radargrammétrie (radar) = ondes électromagnétiques de plus basse fréquence (ondes radio). LIDAR = ondes électromagnétiques proches de la lumière visible (du spectre visible, infrarouge ou ultraviolet).
