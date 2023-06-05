@@ -33,7 +33,7 @@ Dans un premier temps, nous allons étudier les techniques de réalisation de re
 
 ## Les techniques de réalisation de relevés en 3D
 
-Commençont d'abord par étudier comment sont réalisés les relevés en trois dimensions des monuments, comme l'a fait Life 3D pour Notre-Dame.
+Commençons d'abord par étudier comment sont réalisés les relevés en trois dimensions des monuments, comme l'a fait Life 3D pour Notre-Dame.
 
 Ici, c'est **la lasergrammétrie **qui a été choisie. Celle-ci fonctionne avec la technologie LIDAR, qui est aussi utilisée sur les voitures autonomes. Elle consiste à balayer une surface avec un laser pour mesurer des distances.
 
@@ -55,7 +55,7 @@ Les architectes vont donc analyser les relevés, et par exemple s'ils repèrent 
 
 L'intérêt d'un logiciel un peu poussé est de pouvoir, une fois que l'on a modélisé les polyèdres principaux (les murs, les toits, les fenêtres, les portes), mettre en évidence les plus petits groupes de points qui ne sont pas encore modélisés.
 
-Par exemple, si on se rend compte qu'un groupe de points s’écartent d'un mur, il faut vérifier si ce n’est pas un ornement, comme une gargouille qui a été oubliée. La cathédrale de Notre-Dame présentant une architecture gothique riche en détails, il y a un très grand nombre de points à vérifier.
+Par exemple, si on se rend compte qu'un groupe de points s’écarte d'un mur, il faut vérifier si ce n’est pas un ornement, comme une gargouille qui a été oubliée. La cathédrale de Notre-Dame présentant une architecture gothique riche en détails, il y a un très grand nombre de points à vérifier.
 
 ## Comment réaliser ces calculs ?
 
@@ -107,3 +107,11 @@ Les calculs effectués sur ces nuages et les polyèdres sont très coûteux en p
 **Photogrammétrie vs lasergrammétrie ?**
 
 → photogrammétrie : on prend des photos, on les assemble, on obtient un nuage de points. On peut aussi utiliser des drones pour prendre des photos de l’extérieur d’un bâtiment. C’est une technique moins précise que la lasergrammétrie, mais en général plus rapide et moins coûteuse. Sonar = ondes acoustiques. Radargrammétrie (radar) = ondes électromagnétiques de plus basse fréquence (ondes radio). LIDAR = ondes électromagnétiques proches de la lumière visible (du spectre visible, infrarouge ou ultraviolet).
+
+**Comment calculer la distance entre un point et une sphère ?**
+
+→ on calcule la distance entre le point et le centre de la sphère, puis on soustrait le rayon de la sphère à cette distance. Si le résultat est négatif, le point est à l’intérieur de la sphère.
+
+**Quelles autres méthodes moins rapides ?**
+
+→ rubans à mesurer, reconstructions à partir de plans architecturaux...
