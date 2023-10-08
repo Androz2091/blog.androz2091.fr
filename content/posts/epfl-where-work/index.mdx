@@ -203,8 +203,66 @@ Ensuite, il nous faut boucler sur chaque salle, appeler l'API privée du plan de
 
 Après quelques galères avec le format de données renvoyé par le plan de l'EPFL, le fichier JSON est prêt !
 
-## Coder l'intégration
+## Coder notre appli
 
-Ici, nous voulons plusieurs endpoints pour notre API :
-* `GET /salles/near?loc=46.38894987,5.948839` (loc est la latitude et la longitude)
-* `GET /salles/near?loc=46.38894987,5.948839&filter=CM1*` (filter est un filtre sur le nom des salles)
+Nous avons maintenant toutes les clefs en main, let's do it.
+
+### Récupérer les coordonnées de l'utilisateur
+
+```js
+navigator.geolocation.watchPosition((position) => {
+    // on récupère les coordonnées de l'utilisateur
+    const { latitude, longitude } = position.coords;
+
+}, () => {}, {
+    enableHighAccuracy: true,
+    timeout: 5000,
+    maximumAge: 0
+});
+```
+
+### Trier les salles par distance
+
+```js
+function getUserRoomDistance(userLatitude, userLongitude, roomLatitude, roomLongitude) {
+    const R = 6371;
+    const deltaLatitude = deg2rad(roomLatitude - userLatitude);
+    const deltaLongitude = deg2rad(roomLongitude - userLongitude);
+    const a = Math.sin(deltaLatitude/2) ** 2
+        + Math.cos(deg2rad(userLongitude)) * Math.cos(deg2rad(roomLatitude)) * Math.sin(deltaLongitude/2)**2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+function deg2rad (deg) {
+    return deg * (Math.PI/180);
+}
+```
+
+### Connexion à l'API de Flep/Occupancy
+
+```js
+fetch('https://occupancy-backend-e150a8daef31.herokuapp.com/api/rooms/find_free_rooms', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify([{
+        start: start.toISOString(),
+        end: end.toISOString(),
+    }])
+})
+.then((res) => res.json())
+.then((data) => freeRooms = data.map((r) => r.name));
+```
+
+Combiner le tout et...
+
+## L'app est en ligne !
+
+Je suis actuellement au Rolex, les salles les plus proches sont donc les salles de maths, puis celles du CM :)
+
+**Le lien : https://lesswalkmorework.polysource.ch**  
+**Repository GitHub: https://github.com/polysource-projects/lesswalkmorework**
+
+![WebApp](./webapp.jpg)
