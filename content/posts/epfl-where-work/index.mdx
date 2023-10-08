@@ -11,7 +11,7 @@ Un léger problème tout de même, c'est que si vous ne connaissez pas bien l'EP
 
 Quand 30 salles différentes s'affichent, comment savoir si la salle CM 121 est plus proche que vous que la CE 1 515 après avoir mangé à Arcadie ?
 
-Pour optimiser ça, je me suis dit qu'il pourrait être intéressant de permettre de lister les quelques salles proches de soi disponibles.
+Pour optimiser ça, je me suis dit qu'il pourrait être intéressant de permettre de lister les quelques salles disponibles **proches de soi**.
 
 ## Récupérer les coordonnées des salles
 
@@ -22,7 +22,7 @@ Pour cela, il y a plusieurs options :
 - aller les demander au service informatique de l'EPFL
 - essayer de comprendre comment fonctionne le [GeoPortail](https://geoportail.epfl.ch/) de l'EPFL (moins long et clairement plus fun)
 
-Bon. Après avoir ouvert le portail de l'EPFL et inspecter quelques requêtes, je vois qu'on peut effectivement récupérer des points pour chaque salle. 
+Bon. Après avoir ouvert le portail de l'EPFL et inspecter quelques requêtes, je vois qu'on peut effectivement récupérer des "coordonnées" pour chaque salle. 
 
 Par exemple:  
 - `GET` `https://plan.epfl.ch/search?limit=20&partitionlimit=5&interface=main&routing=validated&query=CM1121`  
@@ -73,7 +73,7 @@ Par exemple:
 }
 ```
 
-Donc là, je suis content. Jusqu'à lire les coordonnées. En tant que français peu expérimenté en carto... je me demande pourquoi ce site ne renvoie pas comme habituellement des coordonnées latitude/longitude mais des coordonnées immenses allant jusqu'à 2M.
+Plutôt content. Jusqu'à lire les coordonnées. En tant que français peu expérimenté en carto... je me demande pourquoi ce site ne renvoie pas comme habituellement des coordonnées latitude/longitude mais des coordonnées immenses allant jusqu'à 2M.
 
 Donc là ~~j'abandonne~~ je demande à ChatGPT et la réponse apparait ;)
 
@@ -107,7 +107,7 @@ xCentre /= 1000000;
 yCentre /= 1000000;
 ```
 
-## Calculer la latitude et la longitude
+### Calculer la latitude et la longitude.
 
 ```js
 // les cstes correspondent à l'observatoire de Berne, le nouveau (0,0) de notre système)
@@ -147,6 +147,8 @@ const nouvelleLongitude =
     + longiYP3Coeff * yCentre**3;
 ```
 
+### Convertir en degrés.
+
 Nous obtenons ici des valeurs en secondes d'arc. Or, nous souhaitons des degrés.
 
 La Terre est divisée en 360 degrés (un cercle complet). Chaque degré est divisée en 60 minutes, ce qui nous donne 3600 secondes/degré.
@@ -158,4 +160,51 @@ const nouvelleLatitudeEnDegres = nouvelleLatitude * 1 / 3600 * 10000;
 const nouvelleLongitudeEnDegres = nouvelleLongitude * 1 / 3600 * 10000;
 ```
 
-Et nous sommes prêts !
+Ce script nous sera bien utile par la suite !
+
+## Exporter les coordonnées
+
+Maintenant, il nous faut pouvoir exporter les coordonnées de toutes les salles dans un fichier JSON.
+
+Il y a sans doute une façon plus propre de récupérer la liste des salles, mais je vais utiliser l'API de Flep/Occupancy pour ça.
+
+Ensuite, il nous faut boucler sur chaque salle, appeler l'API privée du plan de l'EPFL, convertir les données et les sauvegarder en suivant cette structure :
+```json
+{
+    "name": "ODY016",
+    "type": "SALLE DE COURS",
+    "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+            [[
+                46.51993236219606,
+                6.567810070631254
+            ],
+            [
+                46.52004457543968,
+                6.567808266620984
+            ],
+            [
+                46.52004564331144,
+                6.567947695378289
+            ],
+            [
+                46.519933430065606,
+                6.5679494990996945
+            ],
+            [
+                46.51993236219606,
+                6.567810070631254
+            ]]
+        ]
+    }
+}
+```
+
+Après quelques galères avec le format de données renvoyé par le plan de l'EPFL, le fichier JSON est prêt !
+
+## Coder l'intégration
+
+Ici, nous voulons plusieurs endpoints pour notre API :
+* `GET /salles/near?loc=46.38894987,5.948839` (loc est la latitude et la longitude)
+* `GET /salles/near?loc=46.38894987,5.948839&filter=CM1*` (filter est un filtre sur le nom des salles)
