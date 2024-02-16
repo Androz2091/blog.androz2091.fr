@@ -116,3 +116,89 @@ update_PS1() {
 shopt -u promptvars
 PROMPT_COMMAND=update_PS1
 ```
+
+## Tip 2 : mettre à jour Discord
+
+```bash
+#!/usr/bin/env bash
+#
+# Script for updating Discord to its latest version.
+#
+# Author: Picnix_
+# Modified for openSUSE (without dpkg) by: @androz2091
+# Date: 2018 (Modified on 2024)
+
+function __log() {
+  local state="$1"
+  shift
+  case "$state" in
+    ERROR)   code='\E[0;31m' ;;
+    OK)      code='\E[0;32m' ;;
+    WARN)    code='\E[0;33m' ;;
+    INFO)    code='\E[0;34m' ;;
+    ABORT)   code='\E[0;35m' ;;
+    PENDING) code='\E[0;36m' ;;
+  esac
+
+  local message="${code:-}[$state]\E[0m $@"
+  [[ $state == "ERROR" ]] && echo -e "$message" 1>&2 || echo -e "$message"
+}
+
+function askif() {
+  read -p "$@ ? (Y/n) "
+  [[ $REPLY =~ Y|y ]]
+}
+
+function kill_discord_process() {
+  pidof Discord > /dev/null 2>&1 && killall Discord && __log OK "Discord process killed" || __log ERROR "Failed to kill Discord process"
+}
+
+function is_discord_running() {
+  pidof Discord > /dev/null 2>&1
+}
+
+function is_discord_installed() {
+  [[ -d /opt/discord || -L /usr/local/bin/discord ]]
+}
+
+function get_remote() {
+  local pattern="(http|https)://[a-zA-Z0-9./?=_-]*"
+  local URL="https://discordapp.com/api/download?platform=linux&format=tar.gz"
+  curl --silent "$URL" | grep -Eo $pattern | sort -u
+}
+
+function exec_reinstall() {
+  __log PENDING "Removing current installation"
+  sudo zypper remove --clean-deps discord > /dev/null 2>&1 || true
+  sudo rm -rf /opt/discord
+  sudo rm -f /usr/local/bin/discord
+  exec_install
+}
+
+function exec_install() {
+  local temp_dir=$(mktemp -d)
+  local dump="${temp_dir}/discord.tar.gz"
+  wget -O "$dump" `get_remote` &&
+    tar -xzf "$dump" -C "$temp_dir" &&
+    sudo mv "${temp_dir}/Discord" /opt/discord &&
+    sudo ln -sf /opt/discord/Discord /usr/local/bin/discord &&
+    rm -rf "$temp_dir" &&
+    __log OK "Installation complete"
+}
+
+function main() {
+  if is_discord_running; then
+    __log WARN "Discord is still running!"
+    askif "Kill Discord process" && kill_discord_process
+  fi
+
+  if is_discord_installed; then
+    askif "Installation found. Remove old version" && exec_reinstall
+    __log OK "Process finished"
+  else
+    askif "No installation found. Install latest version" && exec_install || __log ABORT "Process aborted"
+  fi
+}
+
+main
+```
