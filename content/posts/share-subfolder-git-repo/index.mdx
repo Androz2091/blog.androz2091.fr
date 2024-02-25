@@ -1,0 +1,114 @@
+---
+title: Partager un sous-dossier d'un repository GitHub/GitLab
+date: 2024-02-25
+image: ./root.png
+imageAlt: Root
+---
+
+Dans certains cas, nous voulons partager avec des collaborateurs externes un unique dossier d'un projet privé.
+
+Les contraintes sont les suivantes :
+* les collaborateurs externes doivent pouvoir accéder aux modification du sous-dossier en temps réel (dès que les fichiers sont modifiés sur le repository du projet principal)
+* on ne veut pas rajouter de travail pour les mainteneurs du projet principal (c'est à dire, pas de commande supplémentaire à taper pour push sur un autre repo)
+* on ne veut pas que les collaborateurs externes puissent accéder au reste du projet
+
+Pour donner du contexte au tutoriel, supposons que nous souhaitions partager le dossier **tests** de notre projet, et garder le reste privé.
+
+## Git Submodules ❌
+
+Pour respecter la deuxième contrainte, nous n'utiliserons par exemple pas les Git Submodules. Cela consisterait à créer un repository qui contient le dossier **tests**, puis dans notre repository principal de configurer Git pour lui dire "ce dossier tests, va le chercher sur ce repository" avec la commande `git submodule add <URL-of-the-tests-repository> tests`.
+
+Problème : cela demande d'utiliser `git pull --recurse-submodules` et de s'assurer d'être bien dans le dossier du submodule pour commit et push. Bref, un bazar qu'on veut éviter.
+
+## GitHub Actions ✅
+
+Pour régler ce problème, nous utiliserons les GitHub Actions et deux repositories, un pour le projet principal (privé) et un pour le partage des tests (partagés avec les collaborateurs externes).
+
+### Etape 1 : créer un P.A.T
+
+Nous allons devoir créer un Personal Access Token pour notre GitHub Actions.
+
+**Note pour les organisations :** si vous fonctionnez avec des repositories dans une organisation, il faut aller dans `Organization Settings` puis `Personal Access Tokens` puis `Settings`, et cocher `Allow access via fine-grained personal access tokens`. En créant le P.A.T il faut définir le `Resource Owner` comme l'organisation.
+
+Il faut sélectionner comme permissions `Repository > Contents > Read and Write`.
+
+Dans les deux repositories, il faudra ajouter le P.A.T comme `Secrets` comme les Actions (avec comme nom `PAT`).
+
+### Etape 2 : créer l'action sur le repository de tests
+
+Sur le repository de tests, nous allons créer une action avec le fonctionnement suivant :
+* quand je reçois une requête web, 
+* je clone le repository principal
+* je clone le repository de tests
+* je copie le dossier de tests du repository principal dans le repository de tests
+* je commit et je push
+
+ça donne le code suivant :
+
+```yml
+name: Sync Specific Folder
+
+on: 
+  repository_dispatch:
+    types:
+      - webhook
+
+jobs:
+  sync-folder:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Test Repository
+        uses: actions/checkout@v3
+        with:
+          path: 'shared-tests'
+    
+      - name: Checkout Main Repository
+        uses: actions/checkout@v3
+        with:
+          repository: 'Androz2091/main-project'
+          token: ${{ secrets.PAT }}
+          path: 'main-project'
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "bot@androz2091.fr"
+          git config --global user.name "Syncer"
+
+      - name: Sync Changes to Specific Folder
+        run: |
+          cd shared-tests
+          cp -R ../main-project/tests/* .
+          git add .
+          git commit -m "Add tests"
+          git push https://androz2091:${{ secrets.PAT }}@github.com/Androz2091/shared-tests.git HEAD:master
+```
+
+* l'URL du repo principal est `Androz2091/main-project`
+* celui des tests `Androz2091/shared-tests`
+
+### Etape 3 : créer l'action sur le repository principal
+
+L'action sur le repository principal est très simple :
+* quand je push,
+* fais une requête web sur l'action du repo de tests
+
+```yml
+name: Trigger Tests Synchronization
+
+on: [push]
+
+jobs:
+  http_request_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Send webhook
+      run: |
+        curl -X POST -H "Authorization: Bearer ${{ secrets.PAT }}" -H "Content-Type: application/json" -d '{"event_type":"webhook"}' https://api.github.com/repos/Androz2091/shared-tests/dispatches
+```
+
+Et voilà !
+Sur GitLab la procédure est similaire. Ils ont même écrit un tutoriel pour [migrer ses GitHub Actions vers GitLab](https://docs.gitlab.com/ee/ci/migration/github_actions.html).
