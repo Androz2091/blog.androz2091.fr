@@ -18,7 +18,9 @@ Alors, pourquoi vouloir exécuter ses tests à chaque push sur le repository ?
 
 Et sans même parler de son utilité, l'automatisation de ces processus est souvent amusante et satisfaisante.
 
-CI/CD fait référence à intégration/déploiement continu (utilisé dans quasiment tous les gros projets). Bref, allons-y.
+CI/CD fait référence à intégration/déploiement continu (utilisé dans quasiment tous les gros projets). Allons-y!
+
+> Un grand merci à [Nico](https://t.me/nico_4153) qui a entièrement écrit l'intégration GitLab, et à [Tom De La Gravière](https://people.epfl.ch/tom.massiasjuriendelagraviere) et [Alessandro](https://t.me/ahl1204) qui après avoir intégrer la pipeline à leur projet ont donné des feedbacks.
 
 ![demo.png](./demo.png)
 
@@ -32,9 +34,10 @@ Notez qu'il est possible de lancer un GitLab Runner sur un serveur cloud si vous
 ## TL;DR
 
 Si vous n'avez pas envie de passer du temps à lire l'explication, voilà comment setup l'intégration :
-* téléchargez le fichier [run_tests.zip](./run_tests.zip)
-* dézippez le fichier et déplacez-le dans un dossier `scripts`
-* téléchargez le fichier [run_tests.yml](./run_tests.yml)
+* téléchargez le fichier [scripts.zip](./scripts.zip)
+* dézippez le fichier et déplacez-le dans votre projet
+* (GitHub) téléchargez le fichier [run_tests.yml](./run_tests.yml)
+* (GitLab) téléchargez le fichier [run_tests_gitlab.yml](./run_tests_gitlab.yml)
 * déplacez-le dans un dossier nommé `.github/workflows`
 * voilà !
 
@@ -61,19 +64,17 @@ De même, on veut compiler les fichiers de tests:
 Pour cela, on doit fournir à `javac` la liste des classes qui sont utilisées par nos tests (comme `PlacedTile.class`, ou `Tile.class`), c'est-à-dire `out/production/classes`.
 
 **Cependant, il reste un problème** : nous n'avons pas importé la librairie Junit. Les méthodes `assertEquals` ou le décorateur `@Test` ne sont pas disponibles.
-Pour régler cela, nous devons aussi fournir à `javac` les fichiers `.jar` compilés de Junit. Ils sont disponibles en ligne, je les ai placés dans un dossier `lib`.
+Pour régler cela, nous devons aussi fournir à `javac` les fichiers `.jar` compilés de Junit, soit le fichier `junit-platform-console-standalone-1.10.2.jar` disponible sur [ce site](https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/).
 
 Ainsi, la commande devient :
 
-* `javac -d out/test/classes -classpath out/production/classes:./lib/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:./lib/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:./lib/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:./lib/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:./lib/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:./lib/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:./lib/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:./lib/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar test/ch/epfl/chacun/*.java`
+* `javac -d out/test/classes -classpath out/production/classes:junit-platform-console-standalone-1.10.2.jar test/ch/epfl/chacun/*.java`
 
 Félicitations, votre projet est compilé!
 
 ### Lancer les tests
 
-Maintenant, nous devons lancer les tests via la console, sans passer par l'interface d'IntelliJ.
-
-Pour cela, nous pouvons récupérer le fichier `junit-platform-console-standalone-1.10.2.jar` sur [ce site](https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/).
+Maintenant, nous devons lancer les tests via la console, également sans passer par l'interface d'IntelliJ.
 
 En précisant les classes de production (donc `Animal.class`, `PlacedTile.class`, etc.) et les classes de tests (donc `AnimalTest.class` par exemple), nous pouvons lancer les tests !
 
@@ -93,7 +94,7 @@ Cela peut être fait automatiquement via la commande suivante :
 
 Cette commande fait également en sorte que si un test échoue, notre script renvoie un code d'erreur compréhensible par GitHub et GitLab comme un cas d'échec.
 
-## Créer le workflow CI/CD
+## (GitHub) Créer le workflow CI/CD
 
 Pour cela, je vais donc me baser sur le format attendu par GitHub même si j'aurais préféré que l'EPFL mette à notre disposition des serveurs pour nous apprendre à utiliser ces outils.
 
@@ -115,11 +116,6 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Unzip library
-        working-directory: ./scripts/run_tests
-        run: |
-          unzip lib.zip
-
       - name: Run tests
         working-directory: ./scripts/run_tests
         run: |
@@ -134,7 +130,22 @@ Ensuite :
 
 * l'étape `checkout` permet de récupérer le code de votre projet dans l'action
 * l'étape `setup JDK` permet de télécharger et d'exposer `java` et `javac`, les outils de développement pour Java (compiler + exécuter les tests)
-* l'étape `unzip library` permet d'extraire les fichiers Junit utiles pour compiler que j'ai préalablement téléchargés
 * l'étape `run tests` permet d'exécuter les tests et d'afficher une icône rouge ou verte en fonction du statut des tests !
+
+## (GitLab) Créer le workflow CI/CD
+
+```yml
+stages:
+  - test
+
+run_tests_job:
+  stage: test
+  image: ubuntu:latest
+  before_script:
+    - apt-get update && apt-get install -y openjdk-21-jdk-devel unzip
+  script:
+    - cd ./scripts/run_tests
+    - ./run_tests.sh
+```
 
 Et voilà ! N'hésitez pas à me DM si vous avez besoin d'aide concernant l'installation.
