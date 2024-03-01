@@ -1,0 +1,11 @@
+stages:
+  - test
+
+run_tests_job:
+  stage: test
+  image: ubuntu:latest
+  before_script:
+    - apt-get update && apt-get install -y openjdk-21-jdk-devel unzip
+  script:
+    - cd ./scripts/run_tests
+    - ./run_tests.sh
