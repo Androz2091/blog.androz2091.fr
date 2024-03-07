@@ -1,11 +1,11 @@
 ---
-title: (WIP) Rooter le Redmi Note 8
+title: L'enfer Xiaomi, root du Redmi Note 8
 date: 2024-02-17
 image: ./root.png
 imageAlt: Root
 ---
 
-Pourquoi je déteste Xiaomi ? La réponse dans cet article qui explique simplement la procédure que j'ai utilisé et les problèmes rencontrés pour rooter le Xiaomi Redmi Note 8 ;)
+Pourquoi Xiaomi m'exaspère ? La réponse dans cet article qui explique simplement la procédure que j'ai utilisé et les problèmes rencontrés pour rooter le Xiaomi Redmi Note 8 Pro ;)
 
 (merci à [Emmanuel](https://fr.linkedin.com/in/emmanuel-omont-37ba272a7) d'avoir accepté de rooter son tel)
 
@@ -94,3 +94,27 @@ Il n'y a plus qu'à attendre 7 jours... :'(
 > ~~**Note :** j'ai trouvé ce soft entre temps qui pourrait fonctionner pour bypass les 168 heures (jamais testé).~~
 > ~~https://drfone.wondershare.com/unlock/bypass-168-hours-waiting-time-for-xiaomi-bootloader-unlocking.html~~
 > Update: ce soft ne fonctionne plus (18 février 2024 ;)
+
+### 7 jours plus tard... flasher le recovery !
+
+Le bootloader est déverrouillé (enfin!).
+
+Maintenant, il faut flasher un recovery. Nous décidons de partir sur la ROM Evolution X, qui recommande le recovery [OrangeFox](https://orangefox.download/).
+
+![recovery.jpg](./recovery.jpg)
+
+(la procédure variant en fonction du système de partitions utilisé, nous avons utilisé [TrebleCheck](https://github.com/kevintresuelo/treble)).
+
+Sauf que... ça ne fonctionne pas. Le téléphone ne veut pas redémarrer sur le recovery flashé (seulement sur le stock recovery).
+
+Il s'écoule environ une journée pendant laquelle Emmanuel se rend compte... que son téléphone est en fait un Xiaomi Redmi Note 8 **Pro** (et non un Redmi Note 8...).
+
+![palm](./palm.gif)
+
+Cela explique pourquoi le fichier recovery téléchargé ne fonctionnait pas.
+
+Après un moment, [TWRP Begonia](https://twrp.me/xiaomi/xiaomiredminote8pro.html) est flashé et installé !
+
+![twrp](./twrp3.jpg)
+
+Et après pas mal de tests de ROM, dont PixelElixir, PixelExperience, le téléphone est enfin rooté avec Evolution X (le choix initial :)
