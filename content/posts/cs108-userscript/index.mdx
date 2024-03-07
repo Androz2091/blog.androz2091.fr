@@ -10,6 +10,7 @@ Hello, nouveau tutoriel pour le cours CS-108 de Michel Schinz.
 L'objectif ici est d'améliorer un peu la lisibilité des consignes en réglant deux problèmes :
 * les conseils de programmation sont toujours **après** la définition de la méthode
 * souvent, le nom des méthode à créer n'est pas assez mis en avant à mon goût
+* on ne peut pas copier les liens des sections pour les référencer ailleurs (sur ED par exemple)
 
 Pour cela, nous allons devoir modifier le style de la page dynamiquement avec un userscript (un script JavaScript écrit par un utilisateur pour modifier le comportement d'un site).
 
@@ -84,4 +85,27 @@ conseilsDeProg.forEach((parentDiv) => {
   }
 
 });
+```
+
+Finalement, on boucle sur tous les titres pour leur ajouter un lien de référence :
+
+```js
+for (header of document.querySelectorAll('h3, h4, h5, h6')) {
+  console.log(header.id);
+  const a = document.createElement('a');
+  a.href = 'javascript:void(0)';
+  a.innerText = '(📋)';
+  a.style.marginLeft = '5px';
+  header.appendChild(a);
+  const link = `${window.location.origin}${window.location.pathname}#${header.id}`;
+  a.onclick = () => {
+    a.innerText = '(✅ link copied)';
+    setTimeout(() => a.innerText = '(📋)', 1_000);
+    navigator.clipboard.writeText(link).then(function() {
+      console.log('Async: Copying to clipboard was successful!');
+    }, function(err) {
+      console.error('Async: Could not copy text: ', err);
+    });
+  }
+}
 ```
