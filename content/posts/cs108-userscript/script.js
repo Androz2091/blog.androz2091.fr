@@ -48,3 +48,22 @@ conseilsDeProg.forEach((parentDiv) => {
   }
 
 });
+
+for (header of document.querySelectorAll('h3, h4, h5, h6')) {
+  console.log(header.id);
+  const a = document.createElement('a');
+  a.href = 'javascript:void(0)';
+  a.innerText = '(📋)';
+  a.style.marginLeft = '5px';
+  header.appendChild(a);
+  const link = `${window.location.origin}${window.location.pathname}#${header.id}`;
+  a.onclick = () => {
+    a.innerText = '(✅ link copied)';
+    setTimeout(() => a.innerText = '(📋)', 1_000);
+    navigator.clipboard.writeText(link).then(function() {
+      console.log('Async: Copying to clipboard was successful!');
+    }, function(err) {
+      console.error('Async: Could not copy text: ', err);
+    });
+  }
+}
