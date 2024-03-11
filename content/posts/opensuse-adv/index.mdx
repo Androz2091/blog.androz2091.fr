@@ -65,6 +65,30 @@ Certaines vidéos YouTube sont fluides mais d'autres non. Même chose sur Discor
 
 Solution : https://opensuse-guide.org/codecs.php
 
+## Patch 6 : les raccourcis fonctionnent mal dans Logisim
+
+Lorsque je pressais CTRL + 1, CTRL + 2, etc. l'outil courant ne changeait pas. Au bout d'un moment, j'ai fini par comprendre que cela venait de la disposition du clavier (quand je passais le clavier en US dans Yast tout fonctionnait). Finalement, je suis allé éditer les keycodes manuellement dans... le code source de Logisim.
+
+Fichier `src/main/java/com/cburch/logisim/gui/main/KeyboardToolSelection.java`:
+```java
+final var keyStroke = KeyStroke.getKeyStroke(
+  i == 1 ? 150 : i == 2 ? 0 : i == 3 ? 152 : (char) ('0' + i)
+, mask);
+```
+C'est vraiment un fix très moche. Sachant que j'ai mis 0 pour l'outil 2 parce que certaines touches ne sont pas reconnues, donc heureusement que seulement une des 3 touches CTRL + 1, CTRL + 2 et CTRL + 3 ne fonctionne pas (la 2) sinon cette technique n'aurait pas marché.
+
+Ensuite build gradle et fichier desktop:
+```
+[Desktop Entry]
+Type=Application
+Name=Logisim Evolution
+Comment=Lanceur pour Logisim Evolution
+Icon=/path/to/logisim-evolution/artwork/logisim-evolution-icon.svg
+Exec=java -jar /path/to/logisim-evolution/build/libs/logisim-evolution-3.9.0dev-all.jar
+Terminal=false
+Categories=Development;Education;
+```
+
 ## Tip 1 : script pour améliorer le shell
 
 Ce script dont je ne suis pas l'auteur permet d'améliorer l'interface du shell en ajoutant la branche git courante, le code de statut de la dernière commande exécutée, etc.
