@@ -11,7 +11,16 @@ Cet article me permet de noter les différents patches/bugs/scripts utiles que j
 
 **Note : ces patches fonctionnent pour mon ordinateur Dell XPS 13 9310**.
 
-## Patch 1 : natural scrolling (sur x11)
+![suse](./suse.png)
+
+### Sommaire
+
+* [Patches OpenSUSE](#patches-opensuse)
+* [Customisation d'OpenSUSE](#customisation-dopensuse)
+
+## Patches OpenSUSE
+
+### Patch 1 : natural scrolling (sur x11)
 
 Le natural scrolling de mon touchpad se désactivait aléatoirement après quelques restarts. Il était impossible de le réactiver via l'interface de settings d'openSUSE.
 
@@ -24,7 +33,7 @@ Solution :
 xinput set-prop "DLL0945:00 06CB:CDE6 Touchpad" "libinput Natural Scrolling Enabled" 1
 ```
 
-## Patch 2 : faire fonctionner les hauts-parleurs
+### Patch 2 : faire fonctionner les hauts-parleurs
 
 Les hauts-parleurs ne fonctionnaient pas (le son était en mute forcé).
 
@@ -32,7 +41,7 @@ Solution :
 * mettre à jour le système avec `sudo zypper update`
 * installer sof-software avec `sudo zypper install sof-software`
 
-## Patch 3 : faire fonctionner mes écouteurs bluetooth
+### Patch 3 : faire fonctionner mes écouteurs bluetooth
 
 Mes écouteurs bluetooth n'apparaissaient pas dans la liste des devices audio disponibles.
 
@@ -40,7 +49,7 @@ Solution :
 * mettre à jour le système avec `sudo zypper update`
 * installer pipewire-pulseaudio avec `sudo zypper install pipewire-pulseaudio`
 
-## Patch 4 : faire fonctionner mon hub USB
+### Patch 4 : faire fonctionner mon hub USB
 
 J'ai acheté [cet hub USB](https://www.amazon.fr/dp/B0CHXZYSMG). Sauf qu'en le branchant, openSUSE freeze complètement et plus rien ne fonctionne.
 
@@ -55,7 +64,7 @@ Solution :
 * écrire `blacklist ax88179_178a`
 * redémarrer.
 
-## Patch 5 : lecture de vidéos sur Firefox
+### Patch 5 : lecture de vidéos sur Firefox
 
 Les vidéos se lisent mal sur Firefox :
 
@@ -65,7 +74,7 @@ Certaines vidéos YouTube sont fluides mais d'autres non. Même chose sur Discor
 
 Solution : https://opensuse-guide.org/codecs.php
 
-## Patch 6 : les raccourcis fonctionnent mal dans Logisim
+### Patch 6 : les raccourcis fonctionnent mal dans Logisim
 
 Lorsque je pressais CTRL + 1, CTRL + 2, etc. l'outil courant ne changeait pas. Au bout d'un moment, j'ai fini par comprendre que cela venait de la disposition du clavier (quand je passais le clavier en US dans Yast tout fonctionnait). Finalement, je suis allé éditer les keycodes manuellement dans... le code source de Logisim.
 
@@ -89,7 +98,42 @@ Terminal=false
 Categories=Development;Education;
 ```
 
-## Tip 1 : script pour améliorer le shell
+## Customisation d'OpenSUSE
+
+### i3wm
+
+[Johnny](https://t.me/jo_hnny) m'a énormément aidé (et largement convaincu :) d'installer i3wm en tant que gestionnaire de fenêtres.
+
+Voilà les modifications apportées.
+
+#### Prendre une capture d'écran
+
+```sh
+bindsym --release $mod+Print exec --no-startup-id "import png:- | xclip -selection clipboard -t image/png"
+```
+
+#### Changer la luminosité
+
+```sh
+bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +5%
+bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 5%-
+```
+
+#### Changer le terminal (to Kitty)
+
+```sh
+bindsym $mod+Return exec kitty
+```
+
+#### Changer la barre vers Polybar
+
+```sh
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+```
+
+**Note :** j'avais un pb de connexion wifi qui était dûe au fait que KDE Plasma chiffrait les mots de passe, donc avec i3wm NetworkManager n'arrivait pas à se connecter. J'ai réglé ça en désactivant le chiffrement des mots de passe.
+
+### Script pour améliorer le shell
 
 Ce script dont je ne suis pas l'auteur permet d'améliorer l'interface du shell en ajoutant la branche git courante, le code de statut de la dernière commande exécutée, etc.
 
@@ -137,11 +181,11 @@ update_PS1() {
   export PS1="${prefix_}${username_}@${hostname_}:${location_}${branch_}${status_}\$ "
 }
 
-shopt -u promptvars
+shopt -u promptvars # you might want to disable that with Kitty
 PROMPT_COMMAND=update_PS1
 ```
 
-## Tip 2 : mettre à jour Discord
+### Mettre à jour Discord
 
 ```bash
 #!/usr/bin/env bash
