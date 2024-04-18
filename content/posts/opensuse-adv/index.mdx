@@ -133,6 +133,14 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
 **Note :** j'avais un pb de connexion wifi qui était dûe au fait que KDE Plasma chiffrait les mots de passe, donc avec i3wm NetworkManager n'arrivait pas à se connecter. J'ai réglé ça en désactivant le chiffrement des mots de passe.
 
+#### Faire fonctionner Discord avec i3wm
+
+Discord ne fonctionnait pas bien par défaut avec i3wm (crash). Ce problème peut être réglé en installant le gestionnaire de notifications dunst.
+
+```sh
+sudo zypper install dunst
+```
+
 ### Script pour améliorer le shell
 
 Ce script dont je ne suis pas l'auteur permet d'améliorer l'interface du shell en ajoutant la branche git courante, le code de statut de la dernière commande exécutée, etc.
