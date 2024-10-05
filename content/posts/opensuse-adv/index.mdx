@@ -98,6 +98,14 @@ Terminal=false
 Categories=Development;Education;
 ```
 
+### Patch 7 : faire fonctionner mon écran externe
+
+(sans se logout/login)
+
+* Lister les périphériques avec `xrandr`.
+* Activer l'écran externe avec `xrandr --output DP-1 --auto --right-of eDP-1` ou `xrandr --output HDMI --auto --right-of eDP-1`.
+* Désactiver l'écran externe avec `xrandr --output DP-1 --off`.
+
 ## Customisation d'OpenSUSE
 
 ### i3wm
