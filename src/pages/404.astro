@@ -1,0 +1,21 @@
+---
+import { SITE_TITLE } from '../consts';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <BaseHead title={`404 | ${SITE_TITLE}`} description="Page introuvable" lang="fr" />
+  </head>
+  <body>
+    <main>
+      <Header lang="fr" frHref="/" enHref="/en/" />
+      <h1>404</h1>
+      <p>Cette page n'existe pas. <a href="/">Retour à l'accueil</a>.</p>
+      <Footer />
+    </main>
+  </body>
+</html>

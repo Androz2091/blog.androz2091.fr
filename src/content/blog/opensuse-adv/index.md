@@ -1,0 +1,289 @@
+---
+title: Découverte d'openSUSE, avis et patches
+date: 2024-02-04
+image: ./migrate.png
+imageAlt: Migration d'Ubuntu vers openSUSE
+lang: fr
+---
+
+Après avoir passé plus de 6 mois sur Ubuntu, j'ai décidé après avoir rencontré [picnixz](https://github.com/picnixz) (qui m'a bien aidé :) de migrer vers openSUSE.
+
+Cet article me permet de noter les différents patches/bugs/scripts utiles que je rencontre (beaucoup) pour pouvoir m'en souvenir plus tard (et peut-être plus tard mon avis sur la distrib).
+
+**Note : ces patches fonctionnent pour mon ordinateur Dell XPS 13 9310**.
+
+![suse](./suse.png)
+
+### Sommaire
+
+* [Patches OpenSUSE](#patches-opensuse)
+* [Customisation d'OpenSUSE](#customisation-dopensuse)
+
+## Patches OpenSUSE
+
+### Patch 1 : natural scrolling (sur x11)
+
+Le natural scrolling de mon touchpad se désactivait aléatoirement après quelques restarts. Il était impossible de le réactiver via l'interface de settings d'openSUSE.
+
+![xinput](./xinput.png)
+
+Solution :
+* récupérer le nom de l'input du touchpad avec `xinput`
+* ajouter cette ligne dans le `.profile`:
+```
+xinput set-prop "DLL0945:00 06CB:CDE6 Touchpad" "libinput Natural Scrolling Enabled" 1
+```
+
+### Patch 2 : faire fonctionner les hauts-parleurs
+
+Les hauts-parleurs ne fonctionnaient pas (le son était en mute forcé).
+
+Solution :
+* mettre à jour le système avec `sudo zypper update`
+* installer sof-software avec `sudo zypper install sof-software`
+
+### Patch 3 : faire fonctionner mes écouteurs bluetooth
+
+Mes écouteurs bluetooth n'apparaissaient pas dans la liste des devices audio disponibles.
+
+Solution :
+* mettre à jour le système avec `sudo zypper update`
+* installer pipewire-pulseaudio avec `sudo zypper install pipewire-pulseaudio`
+
+### Patch 4 : faire fonctionner mon hub USB
+
+J'ai acheté [cet hub USB](https://www.amazon.fr/dp/B0CHXZYSMG). Sauf qu'en le branchant, openSUSE freeze complètement et plus rien ne fonctionne.
+
+![dmesg](./dmesg.png)
+
+Le problème était dû au port Ethernet présent sur le hub USB qui n'était pas compatible avec mon ordi. Le blacklister permet de faire fonctionner le reste des ports du hub.
+
+Solution :
+* debugger avec `sudo dmesg -w -H` (`-w` pour follow comme ça on peut voir les logs avant le freeze, `-H` pour un affichage lisible).
+* repérer le port qui pose problème (ici `ax88179_178a`).
+* créer un fichier `/etc/modprobe.d/blacklist-ax88179_178a.conf`
+* écrire `blacklist ax88179_178a`
+* redémarrer.
+
+### Patch 5 : lecture de vidéos sur Firefox
+
+Les vidéos se lisent mal sur Firefox :
+
+![video_glitch](./video-glitch.gif)
+
+Certaines vidéos YouTube sont fluides mais d'autres non. Même chose sur Discord, les attachments ne se lisent pas tout le temps.
+
+Solution : https://opensuse-guide.org/codecs.php
+
+### Patch 6 : les raccourcis fonctionnent mal dans Logisim
+
+Lorsque je pressais CTRL + 1, CTRL + 2, etc. l'outil courant ne changeait pas. Au bout d'un moment, j'ai fini par comprendre que cela venait de la disposition du clavier (quand je passais le clavier en US dans Yast tout fonctionnait). Finalement, je suis allé éditer les keycodes manuellement dans... le code source de Logisim.
+
+Fichier `src/main/java/com/cburch/logisim/gui/main/KeyboardToolSelection.java`:
+```java
+final var keyStroke = KeyStroke.getKeyStroke(
+  i == 1 ? 150 : i == 2 ? 0 : i == 3 ? 152 : (char) ('0' + i)
+, mask);
+```
+C'est vraiment un fix très moche. Sachant que j'ai mis 0 pour l'outil 2 parce que certaines touches ne sont pas reconnues, donc heureusement que seulement une des 3 touches CTRL + 1, CTRL + 2 et CTRL + 3 ne fonctionne pas (la 2) sinon cette technique n'aurait pas marché.
+
+Ensuite build gradle et fichier desktop:
+```
+[Desktop Entry]
+Type=Application
+Name=Logisim Evolution
+Comment=Lanceur pour Logisim Evolution
+Icon=/path/to/logisim-evolution/artwork/logisim-evolution-icon.svg
+Exec=java -jar /path/to/logisim-evolution/build/libs/logisim-evolution-3.9.0dev-all.jar
+Terminal=false
+Categories=Development;Education;
+```
+
+### Patch 7 : faire fonctionner mon écran externe
+
+(sans se logout/login)
+
+* Lister les périphériques avec `xrandr`.
+* Activer l'écran externe avec `xrandr --output DP-1 --auto --right-of eDP-1` ou `xrandr --output HDMI --auto --right-of eDP-1`.
+* Désactiver l'écran externe avec `xrandr --output DP-1 --off`.
+
+## Customisation d'OpenSUSE
+
+### i3wm
+
+[Johnny](https://t.me/jo_hnny) m'a énormément aidé (et largement convaincu :) d'installer i3wm en tant que gestionnaire de fenêtres.
+
+Voilà les modifications apportées.
+
+#### Prendre une capture d'écran
+
+```sh
+bindsym --release $mod+Print exec --no-startup-id "import png:- | xclip -selection clipboard -t image/png"
+```
+
+#### Changer la luminosité
+
+```sh
+bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +5%
+bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 5%-
+```
+
+#### Changer le terminal (to Kitty)
+
+```sh
+bindsym $mod+Return exec kitty
+```
+
+#### Changer la barre vers Polybar
+
+```sh
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+```
+
+**Note :** j'avais un pb de connexion wifi qui était dûe au fait que KDE Plasma chiffrait les mots de passe, donc avec i3wm NetworkManager n'arrivait pas à se connecter. J'ai réglé ça en désactivant le chiffrement des mots de passe.
+
+#### Faire fonctionner Discord avec i3wm
+
+Discord ne fonctionnait pas bien par défaut avec i3wm (crash). Ce problème peut être réglé en installant le gestionnaire de notifications dunst.
+
+```sh
+sudo zypper install dunst
+```
+
+### Script pour améliorer le shell
+
+Ce script dont je ne suis pas l'auteur permet d'améliorer l'interface du shell en ajoutant la branche git courante, le code de statut de la dernière commande exécutée, etc.
+
+Ce script doit être ajouté dans le `.bashrc`.
+
+```bash
+# PS1 changes (with git branches)
+parse_git_branch() {
+    if [[ `git branch 2>/dev/null` ]]; then
+        local bname
+        bname=$(git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
+        local rname
+        rname=$(git remote 2>/dev/null)
+        if [[ $rname =~ 'origin' ]]; then
+            printf '(%s)\n' "$bname"
+        else
+            printf '(%s:%s)\n' "$rname" "$bname"
+        fi
+    fi
+}
+
+update_PS1() {
+  if test $? -eq 0 ; then
+      local status_=""
+  else
+      local status_="\001\033[33m\002($?)\001\033[00m\002 "
+  fi
+    
+  local username_="\001\033[01;32m\002\u\001\033[00m\002"
+  local hostname_="\001\033[01;32m\002\h\001\033[00m\002"
+  local location_="\001\033[01;34m\002\w\001\033[00m\002"
+
+  local branch_="$(parse_git_branch)"
+  if test -z "$branch_" ; then
+      branch_=" "
+  else
+      branch_=" \001\033[38;5;1m\002${branch_}\001\033[00m\002 "
+  fi  
+    
+  local prefix_=""
+  if ! test -z "$VIRTUAL_ENV" ; then
+      prefix_="\001\033[38;5;9m\002[`basename \"$VIRTUAL_ENV\"`]\001\033[00m\002 "
+  fi
+
+  export PS1="${prefix_}${username_}@${hostname_}:${location_}${branch_}${status_}\$ "
+}
+
+shopt -u promptvars # you might want to disable that with Kitty
+PROMPT_COMMAND=update_PS1
+```
+
+### Mettre à jour Discord
+
+```bash
+#!/usr/bin/env bash
+#
+# Script for updating Discord to its latest version.
+#
+# Author: Picnix_
+# Modified for openSUSE (without dpkg) by: @androz2091
+# Date: 2018 (Modified on 2024)
+
+function __log() {
+  local state="$1"
+  shift
+  case "$state" in
+    ERROR)   code='\E[0;31m' ;;
+    OK)      code='\E[0;32m' ;;
+    WARN)    code='\E[0;33m' ;;
+    INFO)    code='\E[0;34m' ;;
+    ABORT)   code='\E[0;35m' ;;
+    PENDING) code='\E[0;36m' ;;
+  esac
+
+  local message="${code:-}[$state]\E[0m $@"
+  [[ $state == "ERROR" ]] && echo -e "$message" 1>&2 || echo -e "$message"
+}
+
+function askif() {
+  read -p "$@ ? (Y/n) "
+  [[ $REPLY =~ Y|y ]]
+}
+
+function kill_discord_process() {
+  pidof Discord > /dev/null 2>&1 && killall Discord && __log OK "Discord process killed" || __log ERROR "Failed to kill Discord process"
+}
+
+function is_discord_running() {
+  pidof Discord > /dev/null 2>&1
+}
+
+function is_discord_installed() {
+  [[ -d /opt/discord || -L /usr/local/bin/discord ]]
+}
+
+function get_remote() {
+  local pattern="(http|https)://[a-zA-Z0-9./?=_-]*"
+  local URL="https://discordapp.com/api/download?platform=linux&format=tar.gz"
+  curl --silent "$URL" | grep -Eo $pattern | sort -u
+}
+
+function exec_reinstall() {
+  __log PENDING "Removing current installation"
+  sudo zypper remove --clean-deps discord > /dev/null 2>&1 || true
+  sudo rm -rf /opt/discord
+  sudo rm -f /usr/local/bin/discord
+  exec_install
+}
+
+function exec_install() {
+  local temp_dir=$(mktemp -d)
+  local dump="${temp_dir}/discord.tar.gz"
+  wget -O "$dump" `get_remote` &&
+    tar -xzf "$dump" -C "$temp_dir" &&
+    sudo mv "${temp_dir}/Discord" /opt/discord &&
+    sudo ln -sf /opt/discord/Discord /usr/local/bin/discord &&
+    rm -rf "$temp_dir" &&
+    __log OK "Installation complete"
+}
+
+function main() {
+  if is_discord_running; then
+    __log WARN "Discord is still running!"
+    askif "Kill Discord process" && kill_discord_process
+  fi
+
+  if is_discord_installed; then
+    askif "Installation found. Remove old version" && exec_reinstall
+    __log OK "Process finished"
+  else
+    askif "No installation found. Install latest version" && exec_install || __log ABORT "Process aborted"
+  fi
+}
+
+main
+```

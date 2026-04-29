@@ -1,0 +1,36 @@
+---
+import { SOCIAL } from '../consts';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div>&copy; {year}, Androz2091</div>
+  <div class="social">
+    <a href={SOCIAL.twitter} target="_blank" rel="noopener">Twitter</a>
+    <a href={SOCIAL.github} target="_blank" rel="noopener">GitHub</a>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--border);
+    margin-top: 3rem;
+    padding: 1.5rem 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .social {
+    display: flex;
+    gap: 1rem;
+  }
+  .social a {
+    color: var(--muted);
+  }
+  .social a:hover {
+    color: var(--primary);
+  }
+</style>

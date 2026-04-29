@@ -1,0 +1,12 @@
+{
+  "name": "blog-androz2091-scripts",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "translate": "node translate.mjs"
+  },
+  "dependencies": {
+    "openai": "^4.73.0"
+  }
+}

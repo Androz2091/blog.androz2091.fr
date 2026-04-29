@@ -1,0 +1,104 @@
+---
+title: Comment les lampes à lave sécurisent-elles Internet ?
+date: 2023-05-21
+image: ./lamps.png
+imageAlt: Lava Lamps (image by Midjourney)
+lang: fr
+---
+
+> Note : cette présentation d'environ 5 minutes a été rédigée dans le cadre d'un oral de sciences. Durant la présentation, ne pas prononcer les titres et accentuer les mots en gras.
+
+### Sommaire
+
+* [Introduction](#introduction)
+* [Qu’est-ce qu’une lampe à lave ?](#qu’est-ce-qu’une-lampe-à-lave-)
+* [Pourquoi la lampe à lave fait-elle partie des systèmes physiques dits chaotiques ?](#pourquoi-la-lampe-à-lave-fait-elle-partie-des-systèmes-physiques-dits-chaotiques-)
+* [Quelle utilité en sécurité informatique ?](#quelle-utilité-en-sécurité-informatique-)
+* [Conclusion](#conclusion)
+
+## Introduction
+
+Les lampes à lave sont souvent décrites comme hypnotisantes et possèdent un mécanisme très intéressant qui mélange des notions de thermodynamique et de chimie. Mais saviez-vous que celles-ci permettent aussi de **chiffrer une grande partie du trafic web** ? Et plus exactement, qu'un mur de cent lampes à lave assure aux internautes une connexion sécurisée sur près d’un quart des sites web accessibles au public ?
+
+C'est ce que nous allons voir, en commençant par **décrire le fonctionnement** d’une lampe à lave, puis en expliquant pourquoi celle-ci fait **partie des systèmes physiques dits chaotiques** et finalement en quoi elle est **utile en sécurité informatique**.
+
+## Qu’est-ce qu’une lampe à lave ?
+
+La lampe à lave est constituée **d’huile minérale** et de bulles de cires colorées non miscibles avec l’huile. Sous ce mélange biphasique se trouve une lampe à incandescence chargée de chauffer et d’éclairer le contenu de la lampe.
+
+Quand la lampe est éteinte, à température ambiante, les bulles de cire sont plus denses que l’huile et se trouvent donc au fond de la lampe.
+
+La capacité thermique de la cire est d'environ 1800 J/kg, contre environ 2100 J/kg pour l'huile minérale. La cire chauffe donc plus vite que l'huile. De plus, le coefficient volumique de dilatation de la cire (en K<sup>-1</sup>) est plus important que celui de l'huile, c'est à dire que pour une même augmentation de température, les bulles de cire vont plus se dilater que l'huile.
+
+Ainsi, quand on allume la lampe, la cire devient rapidement moins dense que l'huile et les bulles commencent à monter dans la lampe grâce à la poussée d'Archimède. De plus, la viscosité de la cire diminue avec la température, ce qui facilite son déplacement.
+
+Une fois en haut du récipient, qui est plus froid car plus éloigné de la lampe à incandescence, la température des bulles diminue, les bulles de cire redeviennent plus denses que l’huile, plus visqueuses et retombent au fond de la lampe. C’est le **phénomène de convection en thermodynamique**.
+
+Le même mécanisme se produit en boucle tant que la lampe à incandescence est allumée et continue de chauffer.
+
+## Pourquoi la lampe à lave fait-elle partie des systèmes physiques dits chaotiques ?
+
+Maintenant que vous en savez un peu plus sur les lampes à lave, pourquoi celles-ci sont utilisées pour sécuriser Internet ?
+
+Eh bien, ces lampes à lave sont intéressantes pour **leur caractère aléatoire**. 
+
+Le mouvement des bulles de cire dans la lampe est **incroyablement complexe et imprévisible**, et c'est un exemple parfait de ce que l'on appelle le "**chaos déterministe**". Il est déterministe parce que le mouvement est déterminé par les lois de la physique, mais il est chaotique parce que même une **infime variation des conditions initiales** peut mener à des résultats radicalement différents.
+
+Cette sensibilité aux conditions initiales fait qu'il est en pratique impossible de prédire exactement comment les bulles de cire vont se déplacer.
+
+Ces conditions initiales différentes peuvent être dûes à de minuscules courants d'air dans la pièce, des variations de tension et de courant électrique alimentant la lampe, des variations de température infimes dans la cire ou le liquide, etc. 
+
+## Quelle utilité en sécurité informatique ?
+
+C'est ici que la sécurité informatique entre en jeu, car dans la pratique, il est très difficile pour **un ordinateur de générer des nombres aléatoires**. Les ordinateurs sont des machines déterministes : ils suivent un ensemble précis d'instructions pour effectuer une tâche donnée. 
+
+Cela signifie que la plupart des nombres "aléatoires" générés par un ordinateur sont en réalité **pseudo-aléatoires** : ils sont générés par un algorithme déterministe et peuvent donc être prédits si l'on connaît les conditions de génération de l’ordinateur.
+
+Or nous avons besoin en sécurité informatique de générer des nombres parfaitement aléatoires. **Quand vous naviguez sur le site de la Fnac** par exemple, une fois que vous êtes authentifié, vous recevez un identifiant, appelé un cookie, qui vous permet de rester connecté. Pour garantir que personne ne puisse usurper votre session, par exemple, en devinant votre identifiant, il doit être unique et imprévisible, c'est-à-dire généré de manière parfaitement aléatoire.
+
+Et c’est pour cela que les lampes à lave sont très utiles. **En filmant une lampe à lave et en appliquant un algorithme de traitement d’images**, il est possible de générer des nombres. Pour chaque pixel renvoyé par la caméra, on obtient trois valeurs « Rouge-Vert-Bleu » variant de 0 à 255 en fonction de leur couleur. Ainsi, avec du dénombrement, on trouve qu’il y a 16M (255^3) de possibilités pour un pixel, donc environ 4 mille millions de milliards d’images différentes avec un capteur de 24 Mégapixel comme disponible sur beaucoup de smartphones, ce qui rend l’image imprédictible. Sur cette suite de pixels, de nombres, on applique ensuite une fonction de hachage pour le raccourcir et générer un nouveau nombre, qu’on appelle un condensé, le nombre aléatoire final.
+
+**Une entreprise appelée Cloudflare** utilise cette technique pour générer des nombres aléatoires, et possède un mur de 100 lampes à lave qui sont filmées avec une caméra. 
+
+Or, Cloudflare est une entreprise qui gère plus de 20% du trafic web mondial.
+
+## Conclusion
+
+En conclusion, les lampes à lave sont très intéressantes d’un point de vue chimique et physique. Celles-ci font intervenir des notions de mécanique des fluides, en particulier le phénomène de convection, ainsi que la notion de densité et de miscibilité en chimie.
+
+Le fait que leur imprévisibilité permette de résoudre un problème de génération de nombres aléatoires, en les impliquant dans le fonctionnement d'une très grande partie du trafic web mondial, ajoute ainsi une dimension fascinante et insoupçonnée pour la plupart des gens à ces lampes à lave.
+
+## Questions fréquentes
+
+**Quel liquide se trouve dans la lampe à lave ?**
+
+→ de l’huile minérale, et plus récemment la composition est tenue secrète par la plupart des fabricants
+
+**Pourquoi la cire a-t-elle une densité un peu supérieure à l’huile minérale ?**
+
+→ on y ajoute du tétrachlorure de carbone (très dense) jusqu’en 1970. Après, la composition est devenue “secrète”.
+
+**Combien de temps pour atteindre un équilibre ?**
+
+→ Il faut généralement 45 à 60 minutes pour que la cire se réchauffe suffisamment pour former des gouttes qui montent librement
+
+**Quelles sont les conditions initiales de l’ordinateur utilisées pour générer des nombres aléatoires ?**
+
+→ par exemple la date actuelle, les informations de mémoire de l’ordinateur, etc.
+
+**Exemples de systèmes physiques chaotiques ?**
+
+→ le pendule double (un pendule attaché à un autre)
+
+**Quelle est la différence entre la chaleur spécifique et la capacité thermique massique ?**
+
+→ deux notions très similaires, la chaleur spécifique est définie en J/g ou en J/mol et la capacité thermique massique en J/kg.
+
+**Pourquoi la cire devient moins visqueuse quand la température augmente ?**
+
+→ la viscosité est la résistance d’un fluide à l’écoulement et + la température augmente + les molécules sont agitées et ont tendance à s’écarter les unes des autres, ce qui diminue la viscosité.
+
+## Sources
+
+* [Description d'une lampe "LAVA"](http://dydaktyka.fizyka.umk.pl/zabawki1/files/termo/lava_big-fr.html)
+* [Blog de Cloudflare](https://www.cloudflare.com/fr-fr/learning/ssl/lava-lamp-encryption/)

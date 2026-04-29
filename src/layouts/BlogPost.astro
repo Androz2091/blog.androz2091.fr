@@ -1,0 +1,121 @@
+---
+import { Image } from 'astro:assets';
+import type { Post } from '../lib/posts';
+import { findSibling, getPostsByLang, postUrl, homeUrl } from '../lib/posts';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import AlternateLangNote from '../components/AlternateLangNote.astro';
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const { title, date, image, imageAlt, excerpt, lang } = post.data;
+
+const sibling = await findSibling(post);
+const siblingHref = sibling ? postUrl(sibling) : null;
+
+const frHref = lang === 'fr' ? Astro.url.pathname : siblingHref ?? homeUrl('fr');
+const enHref = lang === 'en' ? Astro.url.pathname : siblingHref ?? homeUrl('en');
+
+const samelangPosts = await getPostsByLang(lang);
+const idx = samelangPosts.findIndex((p) => p.id === post.id);
+const prev = idx > 0 ? samelangPosts[idx - 1] : null;
+const next = idx >= 0 && idx < samelangPosts.length - 1 ? samelangPosts[idx + 1] : null;
+
+const description = excerpt ?? title;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <BaseHead
+      title={title}
+      description={description}
+      lang={lang}
+      alternate={sibling
+        ? { lang: sibling.data.lang, href: new URL(siblingHref!, Astro.site).toString() }
+        : null}
+    />
+  </head>
+  <body>
+    <main>
+      <Header lang={lang} frHref={frHref} enHref={enHref} />
+      <article>
+        <h1 class="post-title">{title}</h1>
+        <p class="post-meta">
+          <FormattedDate date={date} lang={lang} />
+        </p>
+        {image && (
+          <figure class="hero">
+            <Image src={image} alt={imageAlt ?? ''} />
+          </figure>
+        )}
+        {sibling && siblingHref && (
+          <AlternateLangNote current={lang} href={siblingHref} />
+        )}
+        <div class="post-body">
+          <slot />
+        </div>
+      </article>
+      <nav class="post-nav" aria-label={lang === 'fr' ? 'Articles' : 'Posts'}>
+        {prev && (
+          <a class="prev" href={postUrl(prev)}>
+            ← {prev.data.title}
+          </a>
+        )}
+        {next && (
+          <a class="next" href={postUrl(next)}>
+            {next.data.title} →
+          </a>
+        )}
+      </nav>
+      <Footer />
+    </main>
+  </body>
+</html>
+
+<style>
+  .post-title {
+    margin-top: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+  .post-meta {
+    font-size: 0.85em;
+    margin: 0 0 2rem;
+  }
+  .hero {
+    margin: 0 0 2rem;
+  }
+  .hero img {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+  .post-body :global(img) {
+    display: block;
+    margin: 1.5em auto;
+    border-radius: 4px;
+  }
+  .post-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .post-nav a {
+    text-decoration: none;
+    flex: 1;
+    min-width: 0;
+  }
+  .post-nav .next {
+    text-align: right;
+    margin-left: auto;
+  }
+</style>

@@ -1,22 +1,18 @@
 {
-  "name": "gatsby-starter-blog-theme",
-  "private": true,
+  "name": "blog-androz2091-v2",
+  "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "develop": "gatsby develop",
-    "start": "gatsby develop",
-    "build": "gatsby build",
-    "clean": "gatsby clean"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
   },
-  "license": "0BSD",
   "dependencies": {
-    "gatsby": "^4.16.0",
-    "gatsby-theme-blog": "^4.0.0",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "theme-ui": "0.14.5"
-  },
-  "engines": {
-    "node": ">=14.15.0"
+    "@astrojs/mdx": "^4.3.5",
+    "@astrojs/rss": "^4.0.12",
+    "@astrojs/sitemap": "^3.6.0",
+    "astro": "^5.13.9",
+    "sharp": "^0.34.3"
   }
 }
