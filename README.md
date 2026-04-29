@@ -6,6 +6,11 @@
 
 If you found a typo or an error in a post, you can submit a pull request. Posts live in `src/content/blog/<slug>/`, each with an `index.md` (metadata + content) plus its images.
 
+## RSS feeds
+
+* French: [blog.androz2091.fr/rss.xml](https://blog.androz2091.fr/rss.xml)
+* English: [blog.androz2091.fr/en/rss.xml](https://blog.androz2091.fr/en/rss.xml)
+
 ## Installation
 
 The blog is built with **[Astro](https://astro.build/)** and is very easy to install:
