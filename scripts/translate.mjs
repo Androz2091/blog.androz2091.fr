@@ -38,6 +38,11 @@ Rules:
 - Keep informal tone if the source is informal; technical accuracy matters.
 - The body uses MDX. Leave any JSX expressions untouched.
 
+If the user provides a "previousEnglish" object alongside the French source, treat it as a baseline:
+- Re-use its existing wording verbatim wherever the French is unchanged in meaning.
+- Only modify the English in the spots where the French has actually changed (additions, deletions, rewordings).
+- The goal is a minimal diff — do not rewrite already-acceptable translations.
+
 Output ONLY a JSON object, no surrounding text or code fences. Schema:
 {"title": "<English title>", "body": "<English body, complete markdown/MDX>"}`;
 
@@ -125,8 +130,10 @@ function listPostDirs() {
     .filter((name) => !TARGET_SLUG || name === TARGET_SLUG);
 }
 
-async function callModel(client, title, body) {
-  const userInput = JSON.stringify({ title, body });
+async function callModel(client, title, body, previousEnglish = null) {
+  const payload = { title, body };
+  if (previousEnglish) payload.previousEnglish = previousEnglish;
+  const userInput = JSON.stringify(payload);
   const response = await client.chat.completions.create({
     model: MODEL,
     max_tokens: 16000,
@@ -164,6 +171,7 @@ async function processPost(client, slug) {
   }
   const sourceHash = hashSource(split.frontmatter, split.body);
 
+  let previousEnglish = null;
   if (existsSync(enPath)) {
     const enSplit = splitFrontmatter(readFileSync(enPath, 'utf8'));
     if (enSplit) {
@@ -174,10 +182,13 @@ async function processPost(client, slug) {
       if (enFm.sourceHash === sourceHash) {
         return { slug, status: 'skipped', reason: 'sourceHash match' };
       }
+      if (typeof enFm.title === 'string') {
+        previousEnglish = { title: enFm.title, body: enSplit.body };
+      }
     }
   }
 
-  const translated = await callModel(client, fm.title, split.body);
+  const translated = await callModel(client, fm.title, split.body, previousEnglish);
 
   const newFm = {
     ...fm,
