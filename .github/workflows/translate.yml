@@ -47,5 +47,5 @@ jobs:
             echo "No translation changes."
             exit 0
           fi
-          git commit -m "chore: auto-translate posts [skip ci]"
+          git commit -m "chore: auto-translate posts"
           git push
