@@ -4,8 +4,9 @@ date: 2025-03-15
 image: ./insomnihack.png
 imageAlt: Insomnihack
 lang: en
-sourceHash: 6e2c8df77ae05cee3901be559a4e9ec1366e748155dd798bbb8eed3176306639
+sourceHash: 1e9d1733a591badb6a4b91aa15eb10ee76117c9e3313061b4ed76661363893fd
 manual: false
+featured: true
 ---
 
 
@@ -244,10 +245,10 @@ So, we can't get just the representation of `admin` alone!
 
 After (a lot of) thinking, we come up with a solution!
 
-- Encrypt `43ebe362-4558-45cc-b0e6-104b989cd8a3::admin::guest` and then retrieve the th encrypted block `d8a3::admin::gue`
+- Encrypt `43ebe362-4558-45cc-b0e6-104b989cd8a3::admin::guest` and then retrieve the 4th encrypted block `d8a3::admin::gue`
 - Encrypt `e3482f4e-7970-4da5-8626-15578b78e7a4::aaaaaaaaaaadmin::guest` and then retrieve the 3rd encrypted block `e7a4::aaaaaaaaaa`
 - Replace the 3rd encrypted block of `43ebe362-4558-45cc-b0e6-104b989cd8a3::admin::guest` with the 3rd encrypted block of `e3482f4e-7970-4da5-8626-15578b78e7a4::aaaaaaaaaaadmin::guest`
-- Then add the 3rd block from the encryption of `43ebe362-4558-45cc-b0e6-104b989cd8a3::admin::guest`!
+- Then add the 4th block from the encryption of `43ebe362-4558-45cc-b0e6-104b989cd8a3::admin::guest`!
 
 This gives the following results:
 
