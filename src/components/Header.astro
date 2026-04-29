@@ -1,0 +1,79 @@
+---
+import { Image } from 'astro:assets';
+import { SITE_TITLE, SOCIAL } from '../consts';
+import LangToggle from './LangToggle.astro';
+import type { Lang } from '../lib/posts';
+import avatar from '../assets/avatar.png';
+
+interface Props {
+  lang: Lang;
+  frHref: string;
+  enHref: string;
+}
+
+const { lang, frHref, enHref } = Astro.props;
+const homeHref = lang === 'en' ? '/en/' : '/';
+---
+
+<header class="site-header">
+  <LangToggle current={lang} frHref={frHref} enHref={enHref} />
+  <h1 class="site-title">
+    <a href={homeHref}>{SITE_TITLE}</a>
+  </h1>
+  <div class="site-bio">
+    <Image src={avatar} alt="Androz2091" class="site-avatar" width={56} height={56} />
+    <p>
+      {
+        lang === 'en' ? (
+          <>
+            Bonjour ! Welcome to my blog, about dev, cybersec, infra, etc.
+            projects I'd like to remember later!
+          </>
+        ) : (
+          <>
+            Bonjour ! Bienvenue sur mon blog, à propos de projets de dev,
+            cybersec, infra, etc. dont j'aimerais me souvenir plus tard !
+          </>
+        )
+      }
+    </p>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: relative;
+    padding: 2rem 0 1rem;
+  }
+  .site-title {
+    font-size: 1.5rem;
+    margin: 0 0 1rem;
+    color: var(--text);
+  }
+  .site-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .site-bio {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+  }
+  .site-bio p {
+    margin: 0;
+  }
+  .site-bio a {
+    color: var(--primary);
+    text-decoration: none;
+  }
+  .site-bio a:hover {
+    text-decoration: underline;
+  }
+  .site-avatar {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+  }
+</style>

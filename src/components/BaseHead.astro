@@ -1,0 +1,50 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  lang: 'fr' | 'en';
+  alternate?: { lang: 'fr' | 'en'; href: string } | null;
+}
+
+const { title, description, lang, alternate } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="generator" content={Astro.generator} />
+<link rel="canonical" href={canonicalURL} />
+<link
+  rel="alternate"
+  type="application/rss+xml"
+  title="Androz2091's Blog"
+  href={new URL(lang === 'en' ? 'en/rss.xml' : 'rss.xml', Astro.site)}
+/>
+{
+  alternate && (
+    <link rel="alternate" hreflang={alternate.lang} href={alternate.href} />
+  )
+}
+
+<title>{title}</title>
+<meta name="title" content={title} />
+<meta name="description" content={description} />
+
+<meta property="og:type" content="website" />
+<meta property="og:url" content={Astro.url} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+
+<meta property="twitter:card" content="summary" />
+<meta property="twitter:url" content={Astro.url} />
+<meta property="twitter:title" content={title} />
+<meta property="twitter:description" content={description} />
+
+<script
+  async
+  defer
+  data-website-id="c7374106-e054-4215-b618-2814e7f85f2a"
+  src="https://analytics.androz2091.fr/script.js"
+></script>

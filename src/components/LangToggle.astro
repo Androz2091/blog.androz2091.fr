@@ -1,0 +1,52 @@
+---
+import type { Lang } from '../lib/posts';
+
+interface Props {
+  current: Lang;
+  frHref: string;
+  enHref: string;
+}
+
+const { current, frHref, enHref } = Astro.props;
+---
+
+<div class="lang-toggle" aria-label="Language switcher">
+  <a
+    href={frHref}
+    class:list={['lang', { active: current === 'fr' }]}
+    hreflang="fr">FR</a
+  >
+  <span class="sep">/</span>
+  <a
+    href={enHref}
+    class:list={['lang', { active: current === 'en' }]}
+    hreflang="en">EN</a
+  >
+</div>
+
+<style>
+  .lang-toggle {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    display: flex;
+    gap: 0.35em;
+    align-items: center;
+  }
+  .lang {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .lang.active {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .lang:hover {
+    color: var(--primary);
+  }
+  .sep {
+    color: var(--muted);
+  }
+</style>
