@@ -4,6 +4,7 @@ date: 2025-03-15
 image: ./insomnihack.png
 imageAlt: Insomnihack
 lang: fr
+featured: true
 ---
 
 Un write-up du challenge Unchained du CTF Insomnihack, lequel a lieu tous les ans au Swiss Tech Center à l'EPFL.
