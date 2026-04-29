@@ -4,12 +4,12 @@
 
 ## Contributions
 
-If you found a typo or an error in the post, you can submit a pull request. The files containing the content of the posts are located in the `content` folder. Each post has a `.mdx` file containing its metadata and its content.
+If you found a typo or an error in a post, you can submit a pull request. Posts live in `src/content/blog/<slug>/`, each with an `index.md` (metadata + content) plus its images.
 
 ## Installation
 
-The blog is built with **[Gatsby](https://www.gatsbyjs.com/)** and is very easy to install:
+The blog is built with **[Astro](https://astro.build/)** and is very easy to install:
 
 * Clone the repository.
-* Install the dependencies with NPM or Yarn.
-* Use `yarn start` and `yarn build`.
+* Install the dependencies with `npm install`.
+* Use `npm run dev` and `npm run build`.
