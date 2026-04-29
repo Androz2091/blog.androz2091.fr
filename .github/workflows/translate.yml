@@ -1,0 +1,51 @@
+name: Translate posts
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'src/content/blog/**/index.md'
+      - 'scripts/translate.mjs'
+      - 'scripts/package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: translate-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        working-directory: scripts
+        run: npm install --no-audit --no-fund
+
+      - name: Run translation
+        working-directory: scripts
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: node translate.mjs
+
+      - name: Commit translations
+        run: |
+          if git diff --quiet; then
+            echo "No translation changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/content/blog/**/en.mdx
+          git commit -m "chore: auto-translate posts [skip ci]"
+          git push
