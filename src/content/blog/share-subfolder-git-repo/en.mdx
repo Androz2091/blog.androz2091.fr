@@ -1,0 +1,116 @@
+---
+title: "Sharing a Subdirectory of a GitHub/GitLab Repository"
+date: 2024-02-25
+lang: en
+sourceHash: fa5e8bbd2b3aa268f274389710015e7ed54b6f7b8fe66da43ceb28e1c21a8132
+manual: false
+---
+
+
+In some cases, we want to share just one folder of a private project with external collaborators.
+
+The constraints are as follows:
+* external collaborators should be able to access modifications to the subdirectory in real-time (as soon as the files are modified in the main project repository)
+* we don't want to add extra work for the primary project maintainers (i.e., no additional commands to push to another repo)
+* we don't want external collaborators to access the rest of the project
+
+To give context to the tutorial, let's suppose we want to share the **tests** folder of our project while keeping the rest private.
+
+## Git Submodules ❌
+
+To adhere to the second constraint, we won't use Git Submodules, for example. That would involve creating a repository that contains the **tests** folder, then configuring Git in our main repository to say "this tests folder, get it from this repository" using the command `git submodule add <URL-of-the-tests-repository> tests`.
+
+Problem: it requires using `git pull --recurse-submodules` and ensuring you're well within the submodule folder to commit and push. In short, a hassle we want to avoid.
+
+## GitHub Actions ✅
+
+To solve this problem, we will use GitHub Actions and two repositories, one for the main (private) project and one for sharing the tests (shared with external collaborators).
+
+### Step 1: Create a P.A.T
+
+We will need to create a Personal Access Token for our GitHub Actions.
+
+**Note for organizations:** if you work with repositories in an organization, you need to go to `Organization Settings` then `Personal Access Tokens` then `Settings`, and check `Allow access via fine-grained personal access tokens`. When creating the P.A.T you need to set the `Resource Owner` as the organization.
+
+Select `Repository > Contents > Read and Write` as permissions.
+
+In both repositories, you'll need to add the P.A.T as `Secrets` for the Actions (named `PAT`).
+
+### Step 2: Create the Action on the Tests Repository
+
+On the tests repository, we will create an action with the following functionality:
+* when I receive a web request, 
+* clone the main repository
+* clone the tests repository
+* copy the tests folder from the main repository into the tests repository
+* commit and push
+
+Here's what the code looks like:
+
+```yml
+name: Sync Specific Folder
+
+on: 
+  repository_dispatch:
+    types:
+      - webhook
+
+jobs:
+  sync-folder:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Test Repository
+        uses: actions/checkout@v3
+        with:
+          path: 'shared-tests'
+    
+      - name: Checkout Main Repository
+        uses: actions/checkout@v3
+        with:
+          repository: 'Androz2091/main-project'
+          token: ${{ secrets.PAT }}
+          path: 'main-project'
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "bot@androz2091.fr"
+          git config --global user.name "Syncer"
+
+      - name: Sync Changes to Specific Folder
+        run: |
+          cd shared-tests
+          cp -R ../main-project/tests/* .
+          git add .
+          git commit -m "Add tests"
+          git push https://androz2091:${{ secrets.PAT }}@github.com/Androz2091/shared-tests.git HEAD:master
+```
+
+* The main repo's URL is `Androz2091/main-project`
+* The tests one is `Androz2091/shared-tests`
+
+### Step 3: Create the Action on the Main Repository
+
+The action on the main repository is very simple:
+* when I push,
+* make a web request to the action on the tests repo
+
+```yml
+name: Trigger Tests Synchronization
+
+on: [push]
+
+jobs:
+  http_request_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Send webhook
+      run: |
+        curl -X POST -H "Authorization: Bearer ${{ secrets.PAT }}" -H "Content-Type: application/json" -d '{"event_type":"webhook"}' https://api.github.com/repos/Androz2091/shared-tests/dispatches
+```
+
+And there you go!
+On GitLab, the procedure is similar. They've even written a tutorial for [migrating your GitHub Actions to GitLab](https://docs.gitlab.com/ee/ci/migration/github_actions.html).

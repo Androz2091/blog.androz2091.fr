@@ -1,0 +1,51 @@
+---
+title: "I Got My Domain Hacked"
+date: 2025-07-21
+image: ./hacked.png
+imageAlt: Hacked
+lang: en
+sourceHash: 59dae6f2075b967dbdf4c22d8ccdfab3605b2ed77db4b49d298f91a54115d0eb
+manual: false
+---
+
+
+A bit of context before I tell you about the hack I just fell victim to and discovered a few minutes ago. A method I wouldn't have suspected, and that made me smile, so I'm sharing it here :) and... also so I don't make the same mistake later on.
+
+A month ago, in June 2025, I bought the domain name **stagbot.net**, which I set up to host a GitHub Pages site.
+
+I bought it from OVH, without hosting, and didn't change anything from the default DNS configuration except for the A record for `stagbot.net`, which now points to **185.199.108.153**, GitHub's IP address.
+
+I then went to the associated GitHub repository, set up GitHub Pages, and my site was online in a few minutes.
+
+---
+
+Today, I received this rather strange email from Google:
+
+![Google Email](./googlemail.png)
+
+I click on "Manage users," and only my account is listed, with an "Owner" status. I set it aside.
+
+A few hours later, I decide to search online to see if others have the same issue. Everyone realizes there was a security problem somewhere, and although none seem to match my case, no one has spoken of a Google "bug." Then, I came across this comment:
+
+![DNS Reddit](./dnsreddit.png)
+
+Could someone really have managed to hack my OVH account protected by 2FA and then change my domain's DNS?
+
+I log in, then list the DNS records:
+
+![OVH DNS](./stagbotdns.png)
+
+None were modified, so no OVH hack. But **ftp.stagbot.net** points to **stagbot.net**... which points to GitHub! Get it? :)
+
+So... the hacker:
+- noticed that **ftp.stagbot.net**, created by default by OVH, pointed to GitHub Pages (via the A record of `stagbot.net`)
+- created a GitHub repository and configured GitHub Pages with the domain name **ftp.stagbot.net**
+- was approved by GitHub (since the domain pointed correctly to them and wasn't already configured...)
+- could therefore display anything on **ftp.stagbot.net**
+- was thus able to display a Google script to validate subdomain ownership.
+
+Honestly, well played. 😂
+
+Fortunately, it's not really possible to do much on the Search Console (except to de-index the subdomain, which didn’t interest them since they're using it to reference their own scam site)...!
+
+![ftp](ftpstagbot.png)

@@ -1,0 +1,118 @@
+---
+title: "How to Rebuild Notre-Dame Without Mistakes After the Fire?"
+date: 2023-05-28
+image: ./model.png
+imageAlt: "Notre Dame (image by Wikipedia)"
+lang: en
+sourceHash: 82fda897d579bd925067d3115e0b6c810efa000136cfa5e604ddd88d8688c817
+manual: false
+---
+
+> Note: This approximately 5-minute presentation was prepared for a science oral exam. During the presentation, do not pronounce the titles and emphasize the words in bold. [A diagram](./geogebra-schema.ggb) is also available.
+
+### Summary
+
+* [Introduction](#introduction)
+* [3D Survey Techniques](#les-techniques-de-réalisation-de-relevés-en-3d)
+* [How Are These Surveys Used?](#comment-sont-utilisés-ces-relevés-)
+* [The Importance of Point Cloud Processing Software](#lintérêt-dun-logiciel-de-traitement-de-nuage-de-points)
+* [How to Perform These Calculations?](#comment-réaliser-ces-calculs-)
+* [How to Optimize These Calculations?](#comment-optimiser-ces-calculs-)
+* [Conclusion](#conclusion)
+
+## Introduction
+
+Four years ago, the reconstruction of Notre-Dame Cathedral in Paris began after its fire. This operation was initiated very quickly by Emmanuel Macron, with the goal of restoring the full grandeur of this monument before the Paris 2024 Olympic Games.
+
+But then, **how could the monument be rebuilt with such precision despite this time constraint?**
+
+In France, the most precious or threatened heritage sites are regularly scanned in 3D. In the case of Notre-Dame, it was a company from Toulouse, Life 3D, that was tasked with carrying out these surveys in 2019.  
+
+The main purpose of these surveys is to **create a virtual** copy of the monument, which will be useful if a reconstruction is necessary. 
+
+Initially, we will study the 3D survey techniques, then we will see how these surveys (which are actually point clouds) are used by architects, presenting the calculations and optimizations used by 3D modeling software.
+
+## 3D Survey Techniques
+
+Let's first study how three-dimensional surveys of monuments are carried out, as Life 3D did for Notre-Dame.
+
+Here, **lasergrammetry** was chosen. It works with LIDAR technology, which is also used on autonomous cars. It involves scanning a surface with a laser to measure distances.
+
+It's a very precise, very fast method that can penetrate vegetation and works in low light.
+
+However, other techniques exist such as photogrammetry, which is less costly and faster.
+
+In the end, we get a point cloud of the monument, from which we can determine its precise morphology.
+
+## How Are These Surveys Used?
+
+When the Notre-Dame fire occurred, architects began the phase of reconstructing the plans. To do this, they relied on these point clouds, importing them into their software to use as a model.
+
+It's a bit like drawing on tracing paper, you have a not entirely clean version of the monument underneath, and you want to make a perfect drawing. For example, if a pigeon was on the roof, it would appear in the point cloud, and it obviously must not appear in the reconstruction plans.
+
+Architects will therefore analyze the surveys, and for example, if they spot a wall in the point cloud, they will model it properly using polyhedrons (three-dimensional polygons).
+
+## The Importance of Point Cloud Processing Software
+
+The importance of advanced software is to be able, once the main polyhedrons (walls, roofs, windows, doors) have been modeled, to highlight the smaller groups of points that haven't been modeled yet.
+
+For example, if you notice that a group of points deviates from a wall, you need to check whether it's an ornament, like a gargoyle that was missed. Notre-Dame Cathedral, with its richly detailed Gothic architecture, has a vast number of points to verify.
+
+## How to Perform These Calculations?
+
+Fortunately, these are calculations that can be automated. They are actually distance calculations between the points of the cloud and the already modeled polyhedrons. If the distance is below a certain threshold, we consider the point belongs to the polyhedron.
+
+For example, if we set 5mm as the threshold value and a point is 4mm from a 3D modeled wall, we consider it belongs to the wall. Conversely, if a point is 8mm from a wall, the software should notify the architect to ensure it is not an oversight in the modeling.
+
+But then, **how do we calculate this distance?**
+
+The problem is more complex than calculating a distance between a point and an infinite plane, as we can do using the orthogonal projection of the point onto the plane. When we want to calculate the distance between a point and a polyhedron, it actually involves calculating the distance between a point and several finite faces.
+
+For example, take point A in the corner of the room and the face formed by the table. To calculate the distance between the two, first find the orthogonal projection, which we’ll call B, of point A onto the infinite plane that would be formed by the table.
+
+Now, we need to calculate the distance between this point B and the face of the table.
+We will thus calculate the distance between each segment of the table and point B, then take the minimum distance. For each line formed by the sides of the table, we’ll find the orthogonal projection C of point B onto this line. If point C lies within the segment formed by the side of the table, we directly get the distance between point B and the segment. Otherwise, we find the distance between the table corner A_table and point B using the Pythagorean theorem (square root of (CA_table squared + CB squared)).
+
+Thus, we must perform a large number of calculations to verify the distance between each point and all polyhedrons, knowing these polyhedrons can be very complex, with many faces.
+
+## How to Optimize These Calculations?
+
+These calculations can be optimized by using approximations to reduce their number. The idea is to create “boxes” that will encompass the polyhedrons in simple geometric shapes, like parallelepipeds or spheres. By calculating the distance between a point and the box, we get an approximation of the distance between the point and the polyhedron.
+
+If a point is far from all the “boxes”, we save on complex calculations; it is a point that will have to be reported anyway. If, on the other hand, a point is close to a box, complex calculations will need to be performed as mentioned above to verify the exact distance between the point and the polyhedron and determine whether it needs to be reported.
+
+## Conclusion
+
+In conclusion, if we can admire a cathedral almost identical to the original before the fire during the Paris 2024 Olympics, it is largely thanks to these point cloud processing software.
+
+The calculations performed on these clouds and the polyhedrons are very resource-intensive as there are so many. Therefore, they can be optimized using approximations of the polyhedrons.
+
+## Frequently Asked Questions
+
+**What does LIDAR stand for?**
+
+→ laser imaging detection and ranging
+
+**LIDAR surveys only the exterior?**
+
+→ we only survey the visible, we don't go inside the material. For that, there are other techniques, such as infrared, ultrasound, medical scanners, but these are things Lidar and photogrammetry do not allow.
+
+**More information on how reconstruction plans are made?**
+
+→ 3D modeling with BIM technology, which also includes detailed information about the materials used, structural characteristics, and even costs and construction timelines from the surveys.
+
+**Other uses for 3D scans?**
+
+→ experts sometimes manage to detect design flaws or structural weaknesses
+
+**Photogrammetry vs lasergrammetry?**
+
+→ photogrammetry: we take photos, assemble them, get a point cloud. We can also use drones to take photos of a building's exterior. It's a less precise technique than lasergrammetry, but generally faster and less costly. Sonar = acoustic waves. Radargrammetry (radar) = electromagnetic waves of lower frequency (radio waves). LIDAR = electromagnetic waves close to visible light (visible spectrum, infrared or ultraviolet).
+
+**How to calculate the distance between a point and a sphere?**
+
+→ calculate the distance between the point and the center of the sphere, then subtract the radius of the sphere from this distance. If the result is negative, the point is inside the sphere.
+
+**What other slower methods exist?**
+
+→ measuring tapes, reconstructions from architectural plans...
