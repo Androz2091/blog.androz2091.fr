@@ -36,7 +36,13 @@ Rules:
 - Translate image alt text inside markdown image syntax.
 - Preserve all markdown structure: headings, lists, blockquotes, line breaks.
 - Keep informal tone if the source is informal; technical accuracy matters.
-- The body uses MDX. Leave any JSX expressions untouched.
+
+The body output is MDX (NOT plain markdown). MDX parses JSX, so unescaped \`<\`, \`>\`, and \`{\`/\`}\` in prose can break the build. In prose (NOT inside code blocks or inline code), escape these:
+- A \`<\` that is not the start of a real HTML/JSX tag — e.g. \`<3\` (heart), \`<5\` ("less than 5"), \`< 100ms\`, \`a < b\`. Write them as \`&lt;\` (so \`<3\` → \`&lt;3\`).
+- A \`>\` used as a comparison (\`a > b\`, \`> 50%\`) when it could be confused with a tag close. When in doubt, use \`&gt;\`. Do NOT escape \`>\` at the start of a line — that is a markdown blockquote.
+- Literal curly braces \`{\` / \`}\` in prose — escape as \`\\{\` and \`\\}\` so MDX does not treat them as JSX expressions.
+Inside code blocks (fenced or inline) leave all characters as-is — never escape there.
+Leave existing JSX expressions and HTML/MDX tags untouched.
 
 If the user provides a "previousEnglish" object alongside the French source, treat it as a baseline:
 - Re-use its existing wording verbatim wherever the French is unchanged in meaning.
