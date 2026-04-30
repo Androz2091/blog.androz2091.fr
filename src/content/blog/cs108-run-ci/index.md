@@ -37,10 +37,10 @@ Notez qu'il est possible de lancer un GitLab Runner sur un serveur cloud si vous
 ## TL;DR
 
 Si vous n'avez pas envie de passer du temps à lire l'explication, voilà comment setup l'intégration :
-* téléchargez le fichier [scripts.zip](./scripts.zip)
+* téléchargez le fichier [scripts.zip](/cs108-run-ci/scripts.zip)
 * dézippez le fichier et déplacez-le dans votre projet
-* (GitHub) téléchargez le fichier [run_tests.yml](./run_tests.yml)
-* (GitLab) téléchargez le fichier [run_tests_gitlab.yml](./run_tests_gitlab.yml)
+* (GitHub) téléchargez le fichier [run_tests.yml](/cs108-run-ci/run_tests.yml)
+* (GitLab) téléchargez le fichier [run_tests_gitlab.yml](/cs108-run-ci/run_tests_gitlab.yml)
 * déplacez-le dans un dossier nommé `.github/workflows`
 * voilà !
 

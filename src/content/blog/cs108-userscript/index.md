@@ -21,7 +21,7 @@ Pour cela, nous allons devoir modifier le style de la page dynamiquement avec un
 
 Il existe des dizaines d'extensions permettant de mettre en place ces `userscripts`. Nous allons ici utiliser `ViolentMonkey`, open source et bien maintenu.
 
-**[TL;DR le lien du script final](./script.js)** (à importer dans ViolentMonkey)
+**[TL;DR le lien du script final](/cs108-userscript/script.js)** (à importer dans ViolentMonkey)
 
 ## Détection des définitions de méthodes
 

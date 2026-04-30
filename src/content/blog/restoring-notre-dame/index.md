@@ -6,7 +6,7 @@ imageAlt: Notre Dame (image by Wikipedia)
 lang: fr
 ---
 
-> Note : cette présentation d'environ 5 minutes a été rédigée dans le cadre d'un oral de sciences. Durant la présentation, ne pas prononcer les titres et accentuer les mots en gras. [Un schéma](./geogebra-schema.ggb) est aussi disponible.
+> Note : cette présentation d'environ 5 minutes a été rédigée dans le cadre d'un oral de sciences. Durant la présentation, ne pas prononcer les titres et accentuer les mots en gras. [Un schéma](/restoring-notre-dame/geogebra-schema.ggb) est aussi disponible.
 
 ### Sommaire
 
