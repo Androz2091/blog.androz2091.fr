@@ -36,10 +36,10 @@ poca@pocas-MacBook-Pro-2 aer-lingus-play-reverse-engineering % node seat-keyboar
              ────────────────────────────────────────────────────────────────
 
 [+] minting AT: via /auth/v1/{challenge,solution}
-[✓] AT acquired (egk2xJKsunYpuH_meBeq9J6H…)
-passcode shown on seat ▸ 7491
+[✓] AT acquired ([redacted]…)
+passcode shown on seat ▸ [redacted]
 [+] pairing: tap accept on the seat to confirm…
-[✓] paired with seat 24D (Economy) — auth_token=5KHpQ22wFZzETbBYbhEp
+[✓] paired with seat 24D (Economy) — auth_token=[redacted]
 
   type text to auto-type. commands:
     /up /down /left /right /select    single key
@@ -108,7 +108,7 @@ poca@pocas-MacBook-Pro-2 platform-tools %  uvx --offline --from frida-tools --wi
    . . . .
    . . . .   More info at https://frida.re/docs/home/
    . . . .
-   . . . .   Connected to Pixel 9 Pro XL (id=47191FDAS0084T)
+   . . . .   Connected to Pixel 9 Pro XL (id=[redacted])
 Spawned `com.aerlingus.ife.companion`. Resuming main thread!
 [Pixel 9 Pro XL::com.aerlingus.ife.companion ]-> [+] SSL bypass loaded
 [+] SSLContext.init() bypass
@@ -120,27 +120,27 @@ Ok! On voit que l'appli fait une première requête vers les serveurs de Panason
 
 Requête pour l'endpoint `/challenge`
 ```
-curl -H "AI: ecd6fa3d71fb48ed5a8e07fb50ei~EIN" -H "User-Agent: Dalvik/2.1.0 (Linux; U; Android 16; Pixel 9 Pro XL Build/CP1A.260405.005)" -H "Host: secure.inflightpanasonic.aero" --data "" --compressed "https://secure.inflightpanasonic.aero/inflight/services/auth/v1/challenge"
+curl -H "AI: [redacted]" -H "User-Agent: Dalvik/2.1.0 (Linux; U; Android 16; Pixel 9 Pro XL Build/CP1A.260405.005)" -H "Host: secure.inflightpanasonic.aero" --data "" --compressed "https://secure.inflightpanasonic.aero/inflight/services/auth/v1/challenge"
 ```
 
 et voilà la réponse reçue de la part du serveur:
 ```
 {
-	"counter": 8633959372,
-	"challenge": "5a8d5ee53d1ce7cdfa2b6bb1950ea6c17d29be4a73fe3d140ecc127d33c5cdf1"
+	"counter": [redacted],
+	"challenge": "[redacted]"
 }
 ```
 
 puis l'endpoint solution :
 ```
-curl -H "User-Agent: Dalvik/2.1.0 (Linux; U; Android 16; Pixel 9 Pro XL Build/CP1A.260405.005)" -H "Host: secure.inflightpanasonic.aero" --data "{\"airline_id\":\"ecd6fa3d71fb48ed5a8e07fb50ei~EIN\",\"counter\":8633959373,\"solution\":\"YjkzZmZjMjc3MTI5MTdjM2EwZjkzZWFiNGQxNDE0OGExNzI3Y2JmOGFiM2U1NGU1OTg3Y2Q2ZTEwYzQ1N2M3MA==\"}" --compressed "https://secure.inflightpanasonic.aero/inflight/services/auth/v1/solution"
-{"airline_id":"ecd6fa3d71fb48ed5a8e07fb50ei~EIN","counter":8633959373,"solution":"YjkzZmZjMjc3MTI5MTdjM2EwZjkzZWFiNGQxNDE0OGExNzI3Y2JmOGFiM2U1NGU1OTg3Y2Q2ZTEwYzQ1N2M3MA
+curl -H "User-Agent: Dalvik/2.1.0 (Linux; U; Android 16; Pixel 9 Pro XL Build/CP1A.260405.005)" -H "Host: secure.inflightpanasonic.aero" --data "{\"airline_id\":\"[redacted]\",\"counter\":[redacted],\"solution\":\"[redacted]\"}" --compressed "https://secure.inflightpanasonic.aero/inflight/services/auth/v1/solution"
+{"airline_id":"[redacted]","counter":[redacted],"solution":"[redacted]
 ```
 et la réponse finale :
 ```
 {
-	"counter": 8633959374,
-	"_t": "DRBnKjqbQAC40UtHK2-PxcGdTvro10OKe_nffOpYWgXDG6qJRnraOnsUgvUZZ_WMfIRF_o4Z53-lOfMprX6_pOdu4r_UHj__vzy-P6sNLq0rLokGCVcu_Gc-W-w5s-qQ3o-Y2uM6PITCqK3v7dGPvQ==",
+	"counter": [redacted],
+	"_t": "[redacted]",
 	"_e": 3600
 }
 ```
@@ -153,7 +153,7 @@ Puis chercher `/solution`, pour tomber sur [`HttpAuthConnection.java`](/aer-ling
 
 L'appli stocke donc une `airline_key` quelque part. Elle est passée à `setAirlineKey(context, str)` au démarrage, et après une transformation un peu pénible (`setIsSeatBack`, ligne 331) elle est séparée en deux parties de 32 octets :
 
-- la première moitié, c'est le `airline_id`, `ecd6fa3d71fb48ed5a8e07fb50ei~EIN` dans le cas d'Aer Lingus, qui est envoyé en clair dans les headers du `/challenge`
+- la première moitié, c'est le `airline_id`, `[redacted]` dans le cas d'Aer Lingus, qui est envoyé en clair dans les headers du `/challenge`
 - la deuxième, c'est la clé HMAC-SHA256, 32 octets de secret, jamais envoyés sur le réseau
 
 Le code prend les 64 premiers caractères de la `airline_key` et leur applique deux passes :
@@ -180,15 +180,15 @@ Java.perform(() => {
 
 Je relance l'appli avec ce script en plus du SSL bypass et... nice:
 ```
-[AIRLINE_KEY] e8dbfe3971ff4deb5d840bf05ded~0I5NcE1i105b379e5a6d286b21cdbaf67c9a56747aa3b5c6111a3221b5087ae88c1
+[AIRLINE_KEY] [redacted]
 ```
 
 Par curiosité je grep cette valeur dans les fichiers Java décompilés juste pour vérifier d'où elle vient :
 
 ```
-$ grep -r 'e8dbfe3971ff4deb5d840bf05ded~0I5NcE1i105b379e5a6d286b21cdbaf67c9a56747aa3b5c6111a3221b5087ae88c1' jadx-out/
+$ grep -r '[redacted]' jadx-out/
 jadx-out/sources/com/aerlingus/ife/companion/EINApplication.java:280:
-  .appId("e8dbfe3971ff4deb5d840bf05ded~0I5NcE1i105b379e5a6d286b21cdbaf67c9a56747aa3b5c6111a3221b5087ae88c1")
+  .appId("[redacted]")
 ```
 
 lol 🤡  
