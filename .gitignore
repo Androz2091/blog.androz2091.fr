@@ -68,8 +68,6 @@ yarn-error.log
 # Yarn Integrity file
 .yarn-integrity
 
-aer-lingus*
-
 # Astro
 dist/
 .astro/
