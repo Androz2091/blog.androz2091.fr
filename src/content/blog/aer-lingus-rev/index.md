@@ -1,5 +1,5 @@
 ---
-title: 10h de vol pour casser l'appli Aer Lingus
+title: 10h de vol pour comprendre l'appli Aer Lingus
 date: 2026-04-29
 lang: fr
 featured: true
@@ -7,7 +7,7 @@ featured: true
 
 J'ai remarqué quelques minutes après le décollage de mon vol que la compagnie aérienne Aer Lingus avait développé une nouvelle appli mobile permettant de controller l'écran du siège à distance sur les vols transatlantiques.
 
-*Note de disclosure : cet article est publié de bonne foi, à des fins éducatives et défensives. Les détails sensibles tels que les secrets, payloads complets et code exploitable ont volontairement été omis. Si vous représentez Panasonic Avionics, Aer Lingus ou une partie concernée et pensez qu'une information doit être modifiée ou retirée, contactez-moi à androz2091@gmail.com. Je traiterai rapidement toute demande légitime.*
+*Note de disclosure : aucune vulnérabilité n'a été découverte — cet article explique simplement comment l'appli fonctionne. Il est publié à des fins éducatives, les détails sensibles ont été omis, et toute demande de modification peut être adressée à androz2091@gmail.com.*
 
 Après un long débat avec moi-même pour savoir si le divertissement de pouvoir reverse engineer leur appli dans l'avion valaient les 20 euros de wifi, j'ai cracké, payé et téléchargé :
 - Aer Lingus Play (l'appli à analyser)
