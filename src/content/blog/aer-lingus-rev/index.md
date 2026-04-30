@@ -7,6 +7,8 @@ featured: true
 
 J'ai remarqué quelques minutes après le décollage de mon vol que la compagnie aérienne Aer Lingus avait développé une nouvelle appli mobile permettant de controller l'écran du siège à distance sur les vols transatlantiques.
 
+*Note de disclosure : cet article est publié de bonne foi, à des fins éducatives et défensives. Les détails sensibles tels que les secrets, payloads complets et code exploitable ont volontairement été omis. Si vous représentez Panasonic Avionics, Aer Lingus ou une partie concernée et pensez qu'une information doit être modifiée ou retirée, contactez-moi à androz2091@gmail.com. Je traiterai rapidement toute demande légitime.*
+
 Après un long débat avec moi-même pour savoir si le divertissement de pouvoir reverse engineer leur appli dans l'avion valaient les 20 euros de wifi, j'ai cracké, payé et téléchargé :
 - Aer Lingus Play (l'appli à analyser)
 - Frida (un outil pour patcher des APKs en live avec du JavaScript)
