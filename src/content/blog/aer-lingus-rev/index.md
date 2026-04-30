@@ -217,3 +217,7 @@ Petit problème, le clavier QWERTY du siège n'est pas une grille uniforme : Shi
 ----
 
 Bilan : les 20e de wifi pour reverse engineer cette appli pendant 10h valaient le coup et l'appli de Panasonic est assez bien faite ! Ils ont des choses un peu bizarre qui font penser à de la sécurité par obfuscation (typiquement l'endpoint `challenge` pour obtenir un token qui lit simplement une clef hardcodée et fait une suite de manip bizarres dessus), mais quand même suffisamment sécurisée pour qu'il n'y ait pas vraiment beaucoup plus fun à faire que de repliquer leur appli dans un CLI. Se connecter à un siège random n'est pas possible si le passager n'a pas déjà appairé son appareil, et essayer d'obtenir son code d'appairage demanderait de tester environ 20M de possibilités !
+
+----
+
+*Note de disclosure : cet article est publié de bonne foi, à des fins éducatives et défensives. Les détails sensibles tels que les secrets, payloads complets et code exploitable ont volontairement été omis. Si vous représentez Panasonic Avionics, Aer Lingus ou une partie concernée et pensez qu'une information doit être modifiée ou retirée, contactez-moi à androz2091@gmail.com. Je traiterai rapidement toute demande légitime.*
