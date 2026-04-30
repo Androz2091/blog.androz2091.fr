@@ -1,14 +1,16 @@
 ---
-title: "10-Hour Flight to Hack the Aer Lingus App"
+title: "10-Hour Flight to Break the Aer Lingus App"
 date: 2026-04-29
 lang: en
-sourceHash: b659f1106d3c476f8cdf6483e3cf4c22578274f70bc93867be49e252aa4a6d96
+sourceHash: ed0a8f49b9cc44e7c4393057776bb634c38b86478a17f170e77e913bc00da6ba
 manual: false
 featured: true
 ---
 
 
 I noticed a few minutes after the takeoff of my flight that the airline Aer Lingus had developed a new mobile app allowing you to control the seat screen remotely on transatlantic flights.
+
+*Disclosure note: This article is published in good faith, for educational and defensive purposes. Sensitive details such as secrets, full payloads, and exploitable code have been deliberately omitted. If you represent Panasonic Avionics, Aer Lingus, or any concerned party and believe any information should be modified or removed, contact me at androz2091@gmail.com. I will promptly handle any legitimate request.*
 
 After a long internal debate about whether the entertainment value of reverse engineering their app in-flight was worth the 20 euros for WiFi, I cracked, paid, and downloaded:
 - Aer Lingus Play (the app to analyze)
@@ -219,4 +221,4 @@ Small problem, the QWERTY keyboard on the seat is not a uniform grid: Shift and 
 
 ----
 
-Bottom line: the 20 euros for WiFi to reverse engineer this app for 10 hours was worth it, and the Panasonic app is pretty well made! They have some weird things that seem like security through obscurity (typically the `challenge` endpoint to get a token which just reads a hardcoded key and performs a series of strange manipulations on it), but still secure enough that there's not much more fun to do than replicate their app in a CLI. Connecting to a random seat is not possible unless the passenger has already paired their device, and trying to get their pairing code would require testing around 20M possibilities!
+Bottom line: the 20 euros for WiFi to reverse engineer this app for 10 hours was worth it, and the Panasonic app is pretty well made! They have some weird things that seem like security through obscurity (typically the `challenge` endpoint to get a token that just reads a hardcoded key and performs a series of strange manipulations on it), but still secure enough that there's not much more fun to do than replicate their app in a CLI. Connecting to a random seat is not possible unless the passenger has already paired their device, and trying to get their pairing code would require testing around 20M possibilities!
