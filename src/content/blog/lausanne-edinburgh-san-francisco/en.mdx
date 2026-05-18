@@ -1,0 +1,122 @@
+---
+title: "Working in San Francisco while on an Exchange in Edinburgh"
+date: 2026-05-15
+image: ./tickets.jpg
+lang: en
+sourceHash: fcc1315d10eb896ac2fdced0a635009310b43dddbfa5a68f49f0b88cef4ec9bb
+manual: false
+unlisted: true
+---
+
+
+import Figure from '../../../components/Figure.astro';
+import FigureRow from '../../../components/FigureRow.astro';
+import uber2 from './uber-2.jpg';
+import escalation1 from './escalation.png';
+import escalation2 from './escalation2.png';
+
+I traveled back and forth 4 times between San Francisco and Edinburgh in 5 months to avoid getting kicked out of my uni:
+
+| When | Where I was           | How many days |
+|------------|----------------|------|
+| January 4th   | 🇨🇭 Geneva         | **6** |
+| January 9th   | 🇺🇸 San Francisco  | **27** |
+| February 3rd   | 🏴 Edinburgh (signalment 1)     | **6** |
+| February 8th  | 🇺🇸 San Francisco  | **18** |
+| February 25th | 🏴 Edinburgh (signalment 2)     | **4** |
+| February 28th | 🇺🇸 San Francisco  | **27** |
+| April 24th | 🏴 Edinburgh (exams 1)     | **7** |
+| April 30th  | 🇺🇸 San Francisco  | **10** |
+| May 9th  | 🏴 Edinburgh (exams 2)     | **5** |
+| May 15th (today)  | 🇺🇸 San Francisco      | **38** |
+
+
+I'm a student at [EPFL](https://epfl.ch) in Lausanne, Switzerland, on a one-year exchange at the University of Edinburgh, and I've been working in San Francisco since January. I'm writing this post to remember the headaches I had to solve to make this all work! :)
+
+## Background
+
+I chose Edinburgh for my third year of bachelor’s for its proximity to France and Switzerland (+ to see my family and friends after 2 years of grinding at EPFL), to explore the UK, to give myself time for freelance/projects, and because the university had a good reputation in AI and LLMs.
+
+Besides, I was also looking for a summer internship. Then [Anatole](https://www.linkedin.com/in/debierre/), a friend on exchange in Sweden, told me he got an internship at Uber Netherlands from February to August. The idea of starting as early as February instead of waiting until mid-May appealed to me, so I applied to Uber right away and got the offer.
+
+<Figure src={uber2} alt="Uber welcome email listing intern perks" caption="I was ready to enjoy my breakfast in Amsterdam" />
+  
+But at the same time, a friend recommended me to [Franklin](https://www.linkedin.com/in/franklin-tranie-793397252/), the brother of [Hermine](https://www.linkedin.com/in/herminetranie/), CEO of [ClarityCare AI](https://www.linkedin.com/company/claritycare-ai/) in San Francisco, a health and AI startup looking to recruit quickly.
+
+Several points made me switch from Uber to ClarityCare: the desire to discover SF and the tech ecosystem, to work with a team most likely more up-to-date with LLMs than Uber, their flexibility, and a very good vibe with Hermine during recruitment (who turned out to be an amazing boss, as did the rest of the team!).
+
+Let's do it!!
+
+## Headaches to Make It Work
+
+After choosing to move to San Francisco for my second semester, there were still quite a few issues to resolve.
+
+### Problem 1: Staying Under the Radar with Visas
+
+- constraint to keep the US visa: no more than 30 days outside the United States.
+- and the UK student visa (post-Brexit): 75% or more of the time on the territory, and physical presence at all classes.
+
+Pretty hard to meet the second condition if I'm working full-time in SF.
+
+So I spent hours on Reddit and talking with other students to understand how the uni actually monitors all this. In summary: The University of Edinburgh sponsors visas and must prove to the UK's [Home Office](https://www.gov.uk/government/organisations/home-office) that I am indeed engaged in my studies, or it risks losing its sponsorship license.
+
+To do this, the university has two methods:
+- passive method: professors get students to sign in during classes and labs.
+- active method: if a student hasn't signed in for about 30 days, an Engagement Escalation Process in three stages is triggered, ending in exclusion.
+
+Since the semester started mid-January, my plan was to return in mid/late February to break the engagement escalation process when it would be triggered. I thought that would suffice (no).
+
+### Problem 2: Choosing Courses Wisely
+
+My criteria for a good course:
+
+**Indispensable**
+- no midterm in person
+- no compulsory in-person labs
+- slides and content online
+- course approved by Edinburgh (quotas for exchange students, restrictions outside computer science)
+- course approved as equivalent by my university in Switzerland
+
+**Ideally also**
+- easy to pass (little time to study)
+- no final exam
+- many students in the course (less noticeable if I don't sign)
+
+For this, not really a choice, you need to spend a lot of time on [DRPS](https://www.drps.ed.ac.uk/), Edinburgh's course catalog. I also coded a [scraper for DRPS](https://github.com/Androz2091/edinburgh-coursefinder-scraper/blob/main/index.js) to speed up the search.
+
+My final choice:
+
+| Course | Grading | Labs | Note |
+|---|---|---|---|
+| [Computer Networks and Communications](https://www.drps.ed.ac.uk/25-26/dpt/cxinfr10074.htm) | 50% online project / 50% exam | none announced | content very similar to Computer Systems at EPFL, hence easy |
+| [Innovation-driven Entrepreneurship](https://www.drps.ed.ac.uk/25-26/dpt/cxcmse11515.htm) | 100% online project | none | 100% online so one less stress, but originally not open to exchange students and had to convince the professor |
+| [Advanced Database Systems](http://www.drps.ed.ac.uk/25-26/dpt/cxinfr11217.htm) | 50% project / 50% exam | "highly recommended" | content that interested me, and the slides from last year showed that labs weren't essential |
+| [Usable Security and Privacy](http://www.drps.ed.ac.uk/25-26/dpt/cxinfr11158.htm) | 20% project / 80% exam | 3 "compulsory" labs | two weeks in, the prof announced he'd have students sign in during labs and that those on visas "could have problems if they don't show up" |
+
+---
+
+## In Practice
+
+As mentioned earlier, my plan wasn't to return to Edinburgh as a precaution and to wait for the active process to kick in (when the university would eventually notice I wasn't there anymore).
+
+Tuesday, February 3rd, 5:17 AM in SF, I receive an email from the *Engagement Officer*, with G., my *Student Adviser* in CC. Subject: *Engagement with Studies: Escalation 1*.
+
+<Figure src={escalation1} alt="Escalation 1 email from Robyn Higgins" caption="Nice email to wake up to" />
+
+My last recorded engagement was on 18/12/25. I was right about the ~30-day delay, but in fact for them, the counter started in mid-December (the exams from semester 1), not the beginning of semester 2. I've just entered Stage 1, Stage 2: meeting with the Head of Student Services. Stage 3: exclusion. To exit, I must appear on the 6th floor of Appleton Tower in Edinburgh before Tuesday, February 10th at noon.
+
+I take an Aer Lingus transatlantic flight the same day and meet G. at Appleton Tower, to whom I explain that I had a course alongside the labs of *Usable Security and Privacy* (luckily, it was true, the online course on innovation). She agrees and 10 minutes later I'm out in cold, rainy Edinburgh, super jetlagged, with quite a few regrets about leaving San Francisco :)
+
+In the evening, I think I'll just move forward a bit for ClarityCare during US hours. At 3 AM, I'm still deep in my code. I set the alarm for 5 AM for my flight annnnd... I wake up at 10 AM. First time in my life I miss a plane; -$750 that taught me to stop grinding at the wrong time. Luckily, I managed to rebook the same flight for the next day via Trip.com.
+
+Fifteen days later, Wednesday, February 18th, 7:55 AM in SF, second email. This time from A., *Cohort Lead* and computer science lecturer. Subject: *Brief Check-In*.
+
+<Figure src={escalation2} alt="Brief Check-In email from A." />
+
+Again forced to return to Edinburgh from February 25th to 28th, 3 nights. I meet A. in his office, we chat for 15 minutes: about my courses + casually about life in Edinburgh in general (hard not to slip up but it went well). He records an engagement point, I'm quite relieved he didn't mention San Francisco.
+
+On top of that, I also make sure never to click "Confirm time zone change" on Outlook (shared with the whole uni), not to post anything online, etc. to avoid being bumped to Stage 2 or 3 unintentionally.
+
+I was waiting for a third escalation for weeks, but it never came! 🎉
+
+I made two final trips for the end of semester exams, as ClarityCare preferred me to return between them. And I've officially finished my year in Edinburgh today!
