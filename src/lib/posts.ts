@@ -11,10 +11,14 @@ export async function getAllPosts(): Promise<Post[]> {
   return await getCollection('blog');
 }
 
-export async function getPostsByLang(lang: Lang): Promise<Post[]> {
+export async function getPostsByLang(
+  lang: Lang,
+  { includeUnlisted = false }: { includeUnlisted?: boolean } = {},
+): Promise<Post[]> {
   const all = await getAllPosts();
   return all
     .filter((p) => p.data.lang === lang)
+    .filter((p) => includeUnlisted || !p.data.unlisted)
     .sort((a, b) => {
       const fa = a.data.featured ? 1 : 0;
       const fb = b.data.featured ? 1 : 0;

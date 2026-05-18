@@ -6,15 +6,17 @@ interface Props {
   description: string;
   lang: 'fr' | 'en';
   alternate?: { lang: 'fr' | 'en'; href: string } | null;
+  noindex?: boolean;
 }
 
-const { title, description, lang, alternate } = Astro.props;
+const { title, description, lang, alternate, noindex = false } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="generator" content={Astro.generator} />
+{noindex && <meta name="robots" content="noindex,nofollow" />}
 <link rel="canonical" href={canonicalURL} />
 <link
   rel="alternate"

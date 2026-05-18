@@ -91,6 +91,7 @@ function formatFrontmatter(obj) {
     'sourceHash',
     'manual',
     'featured',
+    'unlisted',
   ];
   const seen = new Set();
   for (const k of order) {
@@ -127,11 +128,19 @@ function hashSource(frontmatter, body) {
   return createHash('sha256').update(stable + '\n---\n' + body).digest('hex');
 }
 
+function findSourcePath(slug) {
+  for (const name of ['index.md', 'index.mdx']) {
+    const full = join(BLOG_DIR, slug, name);
+    if (existsSync(full)) return full;
+  }
+  return null;
+}
+
 function listPostDirs() {
   return readdirSync(BLOG_DIR)
     .filter((name) => {
       const full = join(BLOG_DIR, name);
-      return statSync(full).isDirectory() && existsSync(join(full, 'index.md'));
+      return statSync(full).isDirectory() && findSourcePath(name) !== null;
     })
     .filter((name) => !TARGET_SLUG || name === TARGET_SLUG);
 }
@@ -164,7 +173,10 @@ async function callModel(client, title, body, previousEnglish = null) {
 }
 
 async function processPost(client, slug) {
-  const sourcePath = join(BLOG_DIR, slug, 'index.md');
+  const sourcePath = findSourcePath(slug);
+  if (!sourcePath) {
+    return { slug, status: 'error', reason: 'no index.md or index.mdx' };
+  }
   const enPath = join(BLOG_DIR, slug, 'en.mdx');
   const raw = readFileSync(sourcePath, 'utf8');
   const split = splitFrontmatter(raw);

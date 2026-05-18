@@ -13,7 +13,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { title, date, image, imageAlt, excerpt, lang } = post.data;
+const { title, date, image, imageAlt, excerpt, lang, unlisted } = post.data;
 
 const sibling = await findSibling(post);
 const siblingHref = sibling ? postUrl(sibling) : null;
@@ -36,6 +36,7 @@ const description = excerpt ?? title;
       title={title}
       description={description}
       lang={lang}
+      noindex={unlisted}
       alternate={sibling
         ? { lang: sibling.data.lang, href: new URL(siblingHref!, Astro.site).toString() }
         : null}

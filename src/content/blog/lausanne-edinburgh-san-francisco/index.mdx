@@ -1,0 +1,119 @@
+---
+title: Travailler à San Francisco en échange étudiant à Édimbourg
+date: 2026-05-15
+lang: fr
+image: ./tickets.jpg
+unlisted: true
+---
+
+import Figure from '../../../components/Figure.astro';
+import FigureRow from '../../../components/FigureRow.astro';
+import uber2 from './uber-2.jpg';
+import escalation1 from './escalation.png';
+import escalation2 from './escalation2.png';
+
+J'ai fait 4 allers-retours entre San Francisco et Édimbourg en 5 mois pour ne pas me faire exclure de mon uni :
+
+| Quand | Où je me trouvais           | Combien de jours |
+|------------|----------------|------|
+| 4 Janvier   | 🇨🇭 Genève         | **6** |
+| 9 Janvier   | 🇺🇸 San Francisco  | **27** |
+| 3 Février   | 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Édimbourg (signalement 1)     | **6** |
+| 8 Février  | 🇺🇸 San Francisco  | **18** |
+| 25 Février | 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Édimbourg (signalement 2)     | **4** |
+| 28 Février | 🇺🇸 San Francisco  | **27** |
+| 24 Avril | 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Édimbourg (exams 1)     | **7** |
+| 30 Avril  | 🇺🇸 San Francisco  | **10** |
+| 9 Mai  | 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Édimbourg (exams 2)     | **5** |
+| 15 Mai (aujourd'hui)  | 🇺🇸 San Francisco      | **38** |
+
+
+Je suis étudiant à l'[EPFL](https://epfl.ch) à Lausanne en Suisse, en échange pour un an à l'université d'Édimbourg et je travaille depuis janvier à San Francisco. J'écris ce post pour me souvenir plus tard des casse-tête que j'ai dû résoudre pour que ça puisse tenir debout ! :)
+
+## Contexte
+
+J'ai choisi Édimbourg pour ma 3ème année de bachelor pour la proximité avec la France et la Suisse (+ voir ma famille et mes amis après 2 ans de tryhard à l'EPFL), découvrir le Royaume-Uni, me laisser du temps pour du freelance/projets, et parce que l'uni avait bonne réputation en IA et LLMs.
+
+À côté, je cherchais aussi un stage d'été. Puis [Anatole](https://www.linkedin.com/in/debierre/), un ami en échange en Suède, m'a dit qu'il avait été pris chez Uber Pays-Bas de février à août. L'idée de commencer dès février au lieu d'attendre mi-mai m'a plu, j'ai postulé chez Uber dans la foulée et j'ai eu l'offre.
+
+<Figure src={uber2} alt="Mail de bienvenue Uber listant les perks intern" caption="j'étais prêt à déguster mon petit-déjeuner à Amsterdam" />
+  
+Mais en parallèle, un ami m'a recommandé auprès de [Franklin](https://www.linkedin.com/in/franklin-tranie-793397252/), le frère d'[Hermine](https://www.linkedin.com/in/herminetranie/), CEO de [ClarityCare AI](https://www.linkedin.com/company/claritycare-ai/) à San Francisco, une startup dans la santé et l'IA et qui cherchait à recruter rapidement.
+
+Plusieurs points m'ont fait basculer d'Uber vers ClarityCare : l'envie de découvrir SF et l'écosystème tech, travailler avec une team très probablement plus à jour qu'Uber en termes d'utilisation des LLMs, leur flexibilité, et un très bon feeling avec Hermine lors du recrutement (qui s'est avérée être une boss géniale, comme le reste de l'équipe !).
+
+Let's do it!!
+
+## Casse-tête pour que ça marche
+
+Après avoir choisi de partir à San Francisco pendant mon deuxième semestre, il y avait encore pas mal de problèmes à résoudre.
+
+### Problème 1 : passer sous le radar des visas
+
+- contrainte pour garder le visa US : pas plus de 30 jours en dehors des États-Unis.
+- et le visa étudiant UK (post-Brexit) : 75% ou + du temps sur le territoire, et présence physique à tous les cours.
+
+Assez difficile de respecter la deuxième si je travaille à temps plein à SF.
+
+J'ai donc passé des heures sur Reddit et à discuter avec d'autres étudiants pour comprendre comment l'uni surveille tout ça en pratique. En résumé : l'Université d'Édimbourg sponsorise les visas et doit prouver au [Home Office](https://www.gov.uk/government/organisations/home-office) du Royaume-Uni que je suis bien engagé dans mes études, sinon elle risque de perdre sa licence de sponsoring. 
+
+Pour ça l'université a deux méthodes :
+- méthode passive : les profs font signer les étudiants en cours et en TPs.
+- méthode active : si un étudiant n'a pas signé depuis ~30 jours, un Engagement Escalation Process en trois stages se déclenche, qui se termine par l'exclusion.
+
+Comme le semestre commençait mi-janvier, mon plan était donc de rentrer mi/fin février pour casser l'engagement escalation process quand il se déclencherait. Je pensais que ça suffirait (non).
+
+### Problème 2 : choisir correctement les cours
+
+Mes critères pour un bon cours :
+
+**Indispensables**
+- pas de midterm sur place
+- pas de TPs sur place obligatoires
+- slides et contenu en ligne
+- cours accepté par Édimbourg (quotas pour les étudiants en échange, restrictions hors informatique)
+- cours accepté en équivalence par mon université en Suisse
+
+**Idéalement aussi**
+- facile à passer (peu de temps pour étudier)
+- pas d'examen final
+- beaucoup d'étudiants dans le cours (moins cramé si je ne signe pas)
+
+Pour ça, pas vraiment le choix, il faut passer un temps fou sur [DRPS](https://www.drps.ed.ac.uk/), le catalogue des cours d'Edimbourg. J'ai aussi codé un [scraper pour DRPS](https://github.com/Androz2091/edinburgh-coursefinder-scraper/blob/main/index.js) pour accélérer la recherche.
+
+Mon choix final :
+
+| Cours | Notation | TPs | Note |
+|---|---|---|---|
+| [Computer Networks and Communications](https://www.drps.ed.ac.uk/25-26/dpt/cxinfr10074.htm) | 50% projet en ligne / 50% exam | aucun annoncé | contenu très proche de Computer Systems à l'EPFL, donc facile |
+| [Innovation-driven Entrepreneurship](https://www.drps.ed.ac.uk/25-26/dpt/cxcmse11515.htm) | 100% projet en ligne | aucun | 100% en ligne donc un stress en moins, mais à la base pas ouvert aux étudiants en échange et il a fallu convaincre la prof |
+| [Advanced Database Systems](http://www.drps.ed.ac.uk/25-26/dpt/cxinfr11217.htm) | 50% projet / 50% exam | "très recommandés" | contenu qui m'intéressait, et les slides de l'an passé montraient que les TPs n'étaient pas indispensables |
+| [Usable Security and Privacy](http://www.drps.ed.ac.uk/25-26/dpt/cxinfr11158.htm) | 20% projet / 80% exam | 3 TPs "obligatoires" | deux semaines après le début, le prof a annoncé qu'il ferait signer aux TPs et que les étudiants sur visa "pourraient avoir des problèmes s'ils ne se présentaient pas" |
+
+---
+
+## Et en pratique
+
+Comme mentionné plus haut, je ne comptais pas rentrer à Édimbourg par prévention et attendre que le process actif se déclenche (quand l'université finirait par remarquer que je n'étais plus là).
+
+Mardi 3 février, 5h17 du matin à SF, je reçois un mail de l'*Engagement Officer*, avec G., ma *Student Adviser* en CC. Objet : *Engagement with Studies : Escalation 1*.
+
+<Figure src={escalation1} alt="Email d'Escalation 1 de Robyn Higgins" caption="Sympa comme mail au réveil" />
+
+Mon dernier engagement enregistré remonte au 18/12/25. J'avais raison sur le délai d'environ 30 jours, mais en fait pour eux le compteur partait de mi-décembre (les exams du semestre 1), pas du début du semestre 2. Je viens d'entrer au Stage 1, le Stage 2 : meeting avec le Head of Student Services. Stage 3 : exclusion. Pour sortir, je dois me présenter à l'étage 6 de l'Appleton Tower à Édimbourg avant mardi 10 février à midi.
+
+Je prends un vol transatlantique Aer Lingus le jour même et je rencontre G. à Appleton Tower à qui j'explique que j'avais un cours en parallèle des TPs de *Usable Security and Privacy* (par chance, c'était vrai, le cours en ligne sur l'innovation). Elle accepte et 10 minutes plus tard je sors dans Édimbourg froide et pluvieuse, super jetlaggé, en regrettant pas mal San Francisco :)
+
+Le soir je me dis que je vais juste avancer un peu pour ClarityCare sur les heures US. À 3h du matin je suis toujours dans mon code. Je règle l'alarme pour 5h pour mon vol eeet... je me réveille à 10h. Première fois de ma vie que je rate un avion; -$750 qui m'apprendront à arrêter de tryhard au mauvais moment. Heureusement, j'ai pu racheter le même vol pour le lendemain via Trip.com.
+
+Quinze jours plus tard, mercredi 18 février, 7h55 du matin à SF, deuxième mail. Cette fois c'est A., *Cohort Lead* et lecturer en informatique. Objet : *Brief Check-In*.
+
+<Figure src={escalation2} alt="Email Brief Check-In de A." />
+
+Obligé de nouveau de rentrer à Édimbourg du 25 au 28 février, 3 nuits. Je vois A. dans son bureau, on discute 15 minutes : mes cours + des questions casual sur comment ça se passe à Édimbourg en général (chaud de pas faire de gaffe mais ça va). Elle enregistre un engagement point, je repars assez soulagé qu'elle n'ait pas mentionné San Francisco.
+
+À côté de ça je fais aussi attention à ne jamais cliquer sur "Confirmer le changement de fuseau horaire" sur Outlook (partagé avec toute l'uni), à ne rien poster en ligne, etc. pour éviter de passer au Stage 2 ou 3 par inadvertance.
+
+J'attends une troisième escalation pendant des semaines mais elle ne vient jamais ! 🎉
+
+J'ai fait deux derniers allers-retours pour les exams de fin de semestre, comme ClarityCare préférait que je revienne entre les deux. Et j'ai officiellement fini aujourd'hui mon année à Édimbourg !

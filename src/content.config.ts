@@ -17,6 +17,7 @@ const blog = defineCollection({
       sourceHash: z.string().optional(),
       manual: z.boolean().default(false),
       featured: z.boolean().default(false),
+      unlisted: z.boolean().default(false),
     }),
 });
 

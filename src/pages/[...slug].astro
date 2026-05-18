@@ -4,7 +4,7 @@ import BlogPost from '../layouts/BlogPost.astro';
 import { getPostsByLang, getCanonicalSlug, type Post } from '../lib/posts';
 
 export async function getStaticPaths() {
-  const posts = await getPostsByLang('fr');
+  const posts = await getPostsByLang('fr', { includeUnlisted: true });
   return posts.map((post) => ({
     params: { slug: getCanonicalSlug(post.id) },
     props: { post },

@@ -1,0 +1,23 @@
+---
+// Wraps multiple <Figure> elements side by side. Stacks on narrow screens.
+---
+
+<div class="figure-row">
+  <slot />
+</div>
+
+<style>
+  .figure-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 1.5rem 0;
+  }
+  .figure-row :global(figure) {
+    flex: 1 1 0;
+    min-width: 200px;
+    margin: 0;
+  }
+</style>
