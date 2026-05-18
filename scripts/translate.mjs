@@ -1,20 +1,17 @@
 #!/usr/bin/env node
-// Auto-translate French blog posts (lang: fr) to English siblings (en.mdx).
+// Auto-translate French blog posts (lang: fr) to English siblings.
+// Output extension mirrors the source: index.md → en.md, index.mdx → en.mdx.
 //
-// For each src/content/blog/<slug>/index.md with lang: fr, this script:
+// For each src/content/blog/<slug>/index.{md,mdx} with lang: fr, this script:
 //   1. Computes a SHA-256 of the frontmatter (excluding sourceHash) + body
-//   2. Looks for src/content/blog/<slug>/en.mdx
+//   2. Looks for the matching en.{md,mdx}
 //      - If `manual: true` in its frontmatter, skip (human-edited)
 //      - If `sourceHash` already matches, skip (up-to-date)
-//   3. Otherwise calls Claude to translate, writes the en.mdx file
+//   3. Otherwise calls Claude to translate, writes the en file
 //
 // Usage:
 //   OPENAI_API_KEY=... node scripts/translate.mjs            # all posts
 //   OPENAI_API_KEY=... node scripts/translate.mjs <slug>     # one post
-//
-// Convention:
-//   src/content/blog/<slug>/index.md  -- source (lang: fr or lang: en)
-//   src/content/blog/<slug>/en.mdx    -- generated translation (when source is fr)
 
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
@@ -177,7 +174,8 @@ async function processPost(client, slug) {
   if (!sourcePath) {
     return { slug, status: 'error', reason: 'no index.md or index.mdx' };
   }
-  const enPath = join(BLOG_DIR, slug, 'en.mdx');
+  const sourceExt = sourcePath.endsWith('.mdx') ? '.mdx' : '.md';
+  const enPath = join(BLOG_DIR, slug, `en${sourceExt}`);
   const raw = readFileSync(sourcePath, 'utf8');
   const split = splitFrontmatter(raw);
   if (!split) {
