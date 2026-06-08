@@ -4,7 +4,7 @@ on:
   push:
     branches: [master]
     paths:
-      - 'src/content/blog/**/index.md'
+      - 'src/content/blog/**/index.mdx'
       - 'scripts/translate.mjs'
       - 'scripts/package.json'
   workflow_dispatch:

@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 // Auto-translate French blog posts (lang: fr) to English siblings.
-// Output extension mirrors the source: index.md → en.md, index.mdx → en.mdx.
 //
-// For each src/content/blog/<slug>/index.{md,mdx} with lang: fr, this script:
+// For each src/content/blog/<slug>/index.mdx with lang: fr, this script:
 //   1. Computes a SHA-256 of the frontmatter (excluding sourceHash) + body
-//   2. Looks for the matching en.{md,mdx}
+//   2. Looks for the matching en.mdx
 //      - If `manual: true` in its frontmatter, skip (human-edited)
 //      - If `sourceHash` already matches, skip (up-to-date)
-//   3. Otherwise calls Claude to translate, writes the en file
+//   3. Otherwise calls Claude to translate, writes en.mdx
 //
 // Usage:
 //   OPENAI_API_KEY=... node scripts/translate.mjs            # all posts
@@ -126,11 +125,8 @@ function hashSource(frontmatter, body) {
 }
 
 function findSourcePath(slug) {
-  for (const name of ['index.md', 'index.mdx']) {
-    const full = join(BLOG_DIR, slug, name);
-    if (existsSync(full)) return full;
-  }
-  return null;
+  const full = join(BLOG_DIR, slug, 'index.mdx');
+  return existsSync(full) ? full : null;
 }
 
 function listPostDirs() {
@@ -172,10 +168,9 @@ async function callModel(client, title, body, previousEnglish = null) {
 async function processPost(client, slug) {
   const sourcePath = findSourcePath(slug);
   if (!sourcePath) {
-    return { slug, status: 'error', reason: 'no index.md or index.mdx' };
+    return { slug, status: 'error', reason: 'no index.mdx' };
   }
-  const sourceExt = sourcePath.endsWith('.mdx') ? '.mdx' : '.md';
-  const enPath = join(BLOG_DIR, slug, `en${sourceExt}`);
+  const enPath = join(BLOG_DIR, slug, 'en.mdx');
   const raw = readFileSync(sourcePath, 'utf8');
   const split = splitFrontmatter(raw);
   if (!split) {
