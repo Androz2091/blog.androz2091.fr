@@ -64,20 +64,22 @@ Okay now that we know that, what runs where, and when?
 When we schedule a workflow:
 1. its code runs on any available worker.
 2. as soon as this worker encounters an activity that hasn't run yet, it the workflow sends a request to Temporal's server to schedule that activity and stops running its code.
-3. then, the activity runs (on any worker), completes and the workflow is scheduled again, from scratch.
-4. it runs on any worker, and when it encounters the activity call, it can now get the result from Temporal's server history instead of scheduling the activity.
+3. then, the activity runs (on any worker), completes, and the workflow is scheduled again. Unless the workflow is cached (an optimization Temporal's workers do by default), it runs again from scratch.
+4. it runs on any worker, and when it reaches the activity call, it gets the result from the server's history instead of scheduling the activity again.
 
 <Callout>
 What I've heard a lot, make sure it's clear for you:
-- a workflow does **not** run continuously. Its code is run from the beginning between each activity.
-- a workflow does **not** magically resume "at the right place" when an activity is completed. The whole workflow is ran from scratch, and activity calls are skipped when they are already completed. This is why it's super important to write deterministic workflows. They are ran maybe dozens of times for the same workflow execution and should always produce the same result. See the gray blocks below.
+- a workflow does **not** run continuously. Between two activities, it holds no thread at all.
+- unless the workflow is cached, it does **not** magically resume "at the right place" when an activity completes. The whole workflow runs again from scratch, and the activity calls that already completed return their recorded result instead of running again.
+- when it is cached, the worker kept it in memory, and it really is like an async function that only resolves when the activity is done.
+- you can't know which of the two will happen, and that's why workflows must be deterministic: the same workflow execution can run dozens of times and must always take the same path. See the gray blocks below.
 </Callout>
 
 <Figure src={workflow} alt="" wide />
 
 Another example and visualization, since this is key:
 
-<Figure src={workflow2} alt="" wide />
+<Figure src={workflow2} alt="" caption="Here the workflow isn't cached, so each workflow task can run on a different worker." wide />
 
 Now that the Temporal's basics are clear, let's jump to what can bite us.
 
