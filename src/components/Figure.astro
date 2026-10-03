@@ -7,12 +7,14 @@ interface Props {
   alt: string;
   caption?: string;
   width?: number;
+  // Lets wide diagrams break out of the text column on large screens.
+  wide?: boolean;
 }
 
-const { src, alt, caption, width = 500 } = Astro.props;
+const { src, alt, caption, wide = false, width = wide ? 1600 : 500 } = Astro.props;
 ---
 
-<figure>
+<figure class:list={[{ wide }]}>
   <button type="button" class="figure-zoom" aria-label="Agrandir l'image">
     <Image src={src} alt={alt} width={width} />
   </button>
@@ -26,6 +28,18 @@ const { src, alt, caption, width = 500 } = Astro.props;
   figure {
     margin: 1.5rem auto;
     text-align: center;
+  }
+  figure.wide {
+    width: min(1100px, 100vw - 2rem);
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+  figure.wide .figure-zoom {
+    display: block;
+    width: 100%;
+  }
+  figure.wide :global(img) {
+    width: 100%;
   }
   .figure-zoom {
     display: inline-block;

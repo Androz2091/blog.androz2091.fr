@@ -1,0 +1,159 @@
+---
+title: What I've learnt the hard way with Temporal for durable execution
+date: 2026-10-03
+image: ./temporal.png
+imageAlt: Temporal
+lang: fr
+---
+
+import Figure from '../../../components/Figure.astro';
+import Callout from '../../../components/Callout.astro';
+import step1 from './step1.png';
+import step2 from './step2.png';
+import step5 from './step5.png';
+import step6 from './step6.png';
+import happythreads from './happythreads.png';
+import handoff from './handoff.png';
+import workflow from './workflow.png';
+import workflow2 from './workflow-2.png';
+import slotsthreads from './slotsthreads.png';
+import happyslots from './happyslots.png';
+import zombiethread from './zombiethread.png';
+
+At ClarityCare AI, we process **thousands of prior authorization requests every day**. When a patient requests approval from their insurance provider, we run a series of steps to verify their eligibility.
+
+This series of steps, which we call a workflow, involves many expensive API calls to LLMs, and the entire workflow can take several minutes to complete.
+
+Given this context, using Temporal for our backend allows us, to:
+- Get extreme reliability by consistently retrying steps when they fail, without losing the work done before. The day we moved to Temporal, all transient failures (extremely common with LLMs these days) were gone.
+- Get excellent visibility into what is running on our servers at any given time.
+- Scale very confidently by distributing the load across several workers and containers.
+- Handle bursts of activity from our customers by queueing workflows if we reach our infrastructure's capacity.
+
+Temporal is easy to start with, and it has footguns. We're a small team at ClarityCare and we can't run five tools to make one tool work: no Redis on the side, no custom queue, no overengineering. Concurrency limits, retries and safe deploys all have to come from Temporal itself, configured the right way.
+
+The point of this article is to summarize how Temporal works (to onboard new team members, since we're hiring :), and to explain the two main footguns we've recently encountered.
+
+## Summary
+
+0. [Temporal 101](#temporal-101)
+1. [Footgun 1: `max_concurrent_activities` &lt; number of threads](#footgun-1-max_concurrent_activities--number-of-threads)
+2. [Footgun 2: Kill zombie threads](#footgun-2-no-zombie-threads)
+
+## Temporal 101
+
+Let's start from scratch and recall how Temporal works.
+
+As mentioned above, a very important feature of Temporal is its ability to "save" the work that's been done so far such that we can recover from a failure of a step in the workflow. So how does this work?
+
+In Temporal, there are two different kind of unit of work (called "tasks"): workflows and activities.
+- Workflows are entirely deterministic, and they should not make any blocking calls (so they should be very fast to run).
+- Activities are called from workflows, and can do I/O, make network calls, etc.
+
+To start a workflow, we make a request to Temporal's server, and we specify a queue name. It can be anything, but we'll have to start a worker with that specific queue name for the workflow to run.
+The Temporal server keeps state and queues tasks. It never runs our code and never pushes, our own workers ask for work by polling.
+
+<Figure src={step1} alt="" wide />
+
+The first important thing to understand is that **one task queue is, in reality, two queues**: one queue for workflows, one queue for activities. And each worker polls both, and run both kind of tasks in parallel (we'll see that later).
+
+<Figure src={step2} alt="" wide />
+
+Okay now that we know that, what runs where, and when?
+
+When we schedule a workflow:
+1. its code runs on any available worker.
+2. as soon as this worker encounters an activity that hasn't run yet, it the workflow sends a request to Temporal's server to schedule that activity and stops running its code.
+3. then, the activity runs (on any worker), completes and the workflow is scheduled again, from scratch.
+4. it runs on any worker, and when it encounters the activity call, it can now get the result from Temporal's server history instead of scheduling the activity.
+
+<Callout>
+What I've heard a lot, make sure it's clear for you:
+- a workflow does **not** run continuously. Its code is run from the beginning between each activity.
+- a workflow does **not** magically resume "at the right place" when an activity is completed. The whole workflow is ran from scratch, and activity calls are skipped when they are already completed. This is why it's super important to write deterministic workflows. They are ran maybe dozens of times for the same workflow execution and should always produce the same result. See the gray blocks below.
+</Callout>
+
+<Figure src={workflow} alt="" wide />
+
+Another example and visualization, since this is key:
+
+<Figure src={workflow2} alt="" wide />
+
+Now that the Temporal's basics are clear, let's jump to what can bite us.
+
+## Footgun 1: `max_concurrent_activities` &lt; number of threads
+
+To create a Temporal worker using Temporal's Python SDK, you simply need to instantiate one using the `Worker` class. Let's see how to configure it properly.
+
+So as we said, a worker polls a queue for tasks (workflows and activities). Each worker advertises to Temporal's server a number of concurrent workflows and a number of concurrent activities it can run via a property called `max_concurrent_{workflow_tasks,activities,local_activities}`. We haven't talked about local activities yet, so let's focus on the other two.
+
+By default, Temporal's Python SDK sets those values to 100. This already means that if you have less than 100 activities and workflows waiting on the server side, it's useless to deploy more than one Temporal worker, tasks will always be taken by the same worker (i.e. by default, you will not spread the load by deploying two containers running an instance of a worker).
+
+In this diagram, the worker activity queue is full, so it stops taking tasks from the server. We say that the tasks left on the server side are **scheduled** but not **started**.
+
+<Figure src={step5} alt="" wide />
+
+How does the scheduling work exactly, and what is inside a worker?
+
+<Figure src={step6} alt="" wide />
+
+Each worker process (for us, one container) runs Temporal's Rust core on its own Tokio threads. The core is the only part that talks to Temporal's server: it holds the long polls open and sends the results back.
+
+Inside that process we create one or more worker instances, one `Worker(...)` object per task queue. Each instance runs two loops on the process's asyncio main loop. One calls `poll_workflow_activation` and the other `poll_activity_task`, and both get their next task from the Rust core, never from the server directly. When a task arrives, the loop doesn't run it itself. It hands it off and goes straight back to polling:
+
+- a workflow task runs on the instance's `workflow_task_executor` thread pool
+- a sync (`def`) activity runs on the instance's `activity_executor` thread pool
+- an async (`async def`) activity runs directly on the main loop
+
+When the code finishes, the result goes back to the Rust core, which sends it to the server.
+
+<Callout>
+Don't mix up a worker **process** and a worker **instance** (Temporal's docs call them **Worker Process** and **Worker Entity**). One process runs several instances: at ClarityCare, one container runs six, one per task queue.
+
+- Per instance: the task queue, the slots, the pollers, the thread pools and the workflow cache.  
+- Per process: the Rust core, the connection to the server, the asyncio main loop, the CPU and memory, and a crash, which takes every instance down at once.
+
+So `max_concurrent_activities` limits one instance, but a blocking call inside an `async def` activity stalls every instance in the process (which is why Temporal recommends to always make activities `sync`, and this is what we do at ClarityCare).
+</Callout>
+
+Therefore, the effective concurrency of tasks depend on the size of the `ThreadPoolExecutor` per worker instance, and whether an activity is async or sync. If the activity is sync, it needs to be scheduled on its own thread. Therefore, the concurrency per worker/queue is defined solely as `max(ThreadPoolExecutor, max_concurrent_activities)`. If the activites are async, then the concurrency depends on `max_concurrent_activities`, set by the worker, that tells Temporal's server how many activities can be taken by a worker.
+
+So as we said earlier, if the worker advertises `max_concurrent_activities=5` and its `ThreadPoolExecutor` is set to 5, everything works well, Temporal's server sees that the task goes to a worker, the worker can run the task directly, then the thread is freed and another task is picked up.
+
+<Figure src={happythreads} alt="" wide />
+
+One mistake that we made at ClarityCare was to leave `max_concurrent_activities` unset (i.e. falling back to the SDK's default of 100), and setting **only** `ThreadPoolExecutor` to 15 (some activities were quite CPU intensive and we wanted to limit their count per VM). The issue with that is that the worker was picking up 100 tasks, then running, in reality, only 15 tasks at a time. The issue is the following:
+
+<Figure src={handoff} alt="" wide />
+
+The timer `StartToClose` (the time you give a task to run) is started **when the worker picks up the task**, not when it gets actually scheduled on a thread. Therefore this is how it looked like:
+
+<Figure src={slotsthreads} alt="" wide />
+
+One worker was eating all the tasks, leaving 0 task for the other worker, and all the tasks started to timeout (we expected the activity to complete within 5mins, the truth is that the last activity had to wait for `max_concurrent_activities/max_threads * time_per_activity` which is about 30mins instead of the expected 5mins).
+
+<Callout>
+The fix: set `max_concurrent_activities` ≤ number of threads. The load started to spread properly between workers, tasks started to queue on Temporal's side instead of on the worker side (therefore using the `ScheduleToClose` timeout, which was way longer, instead of `StartToClose`).
+</Callout>
+
+This is how it looked: 
+
+<Figure src={happyslots} alt="" wide />
+
+## Footgun 2: No zombie threads
+
+However... that didn't fix everything. Some activities were making network calls and we started to realize that some activities started to time out (`StartToClose` timeout), even before starting to run, which was really surprising.
+
+We realized that this was due to zombie threads. Indeed, our `ThreadPoolExecutor` was set to 15, but we realized that sometimes there was a backlog of tasks waiting for threads in a worker, even if `max_concurrent_activities` was also set to 15.
+
+Here is what happened. We had an activity calling an external API, and waiting for the result, sometimes for 100-200s (we were uploading files). Because Python cannot kill a thread, when the activity timed out, the thread wasn't yield. Therefore, a slot was freed, but the thread was still blocked, and a task was seeing its `StartToClose` timer starts without actually being able to start.
+
+<Figure src={zombiethread} alt="" wide />
+
+<Callout>
+The fix: always, always yield the thread before the timeout occurs. For activites making a single HTTP call, it meant setting the timeout of `requests.get` to a value less than the timeout of the activity. For activities making several HTTP calls, it meant using Temporal heartbeats (the thread checks every call if it should keep runnin by calling the main Python loop).
+</Callout>
+
+## Thank you
+
+I hope that this made sense to you! I'm available on Twitter and Discord as @androz2091, shoot me a message, I'd be happy to chat!

@@ -1,0 +1,35 @@
+---
+// Highlighted aside box, e.g. <Callout>Tip text</Callout> or <Callout icon="⚠️">...</Callout>.
+interface Props {
+  icon?: string;
+}
+
+---
+
+<aside class="callout">
+  <div class="callout-body">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .callout {
+    display: flex;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+    padding: 0.9rem 1rem;
+    background: var(--highlight);
+    border-left: 4px solid #f2c94c;
+    border-radius: 4px;
+  }
+  .callout-icon {
+    font-size: 1.2rem;
+    line-height: 1.5;
+  }
+  .callout-body {
+    min-width: 0;
+  }
+  .callout-body :global(> :last-child) {
+    margin-bottom: 0;
+  }
+</style>
