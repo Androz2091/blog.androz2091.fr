@@ -1,0 +1,35 @@
+src/components/Figure.astro
+  s_08816ce71af55f::t_d96f4abf354451 10-11,14,17,32-43
+src/content/blog/temporal-essentials/index.mdx
+  s_08816ce71af55f::t_0c62b2cd8d4041 46
+  s_08816ce71af55f::t_d96f4abf354451 9,11
+  s_08816ce71af55f::t_4b6da19e4fb69b 10
+  h_975f987b1ad57e 1-8,12-45,47-159
+src/components/Callout.astro
+  s_08816ce71af55f::t_0664ddccd9e85a 1-35
+pnpm-lock.yaml
+  h_975f987b1ad57e 1-4098
+pnpm-workspace.yaml
+  h_975f987b1ad57e 1-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d8b022347ebd9f790a40b4adb968dad0ca63229a",
+  "prompts": {},
+  "humans": {
+    "h_975f987b1ad57e": {
+      "author": "androz2091 <androz2091@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_08816ce71af55f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d067fe3f-1038-41f9-8cf3-0f77f133517b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "androz2091 <androz2091@gmail.com>"
+    }
+  }
+}
