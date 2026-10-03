@@ -4,7 +4,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
-import { getPostsByLang, postUrl, getExcerpt } from '../lib/posts';
+import { getPostsByLang, postTitle, postUrl, getExcerpt } from '../lib/posts';
 
 const posts = await getPostsByLang('fr');
 ---
@@ -22,8 +22,8 @@ const posts = await getPostsByLang('fr');
           <article class:list={['post-summary', { featured: post.data.featured }]}>
             <header>
               <h2>
-                <a class="post-link" href={postUrl(post)}>
-                  {post.data.title}
+                <a class="post-link" href={postUrl(post, 'fr')}>
+                  {postTitle(post, 'fr')}
                 </a>
               </h2>
               <small>

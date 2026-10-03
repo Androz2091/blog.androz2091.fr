@@ -14,6 +14,9 @@ const blog = defineCollection({
       imageAlt: z.string().optional(),
       excerpt: z.string().optional(),
       lang: z.enum(['fr', 'en']).default('fr'),
+      // On an English post, lists it on the French side under this title,
+      // with a banner saying it is only available in English.
+      frTitle: z.string().optional(),
       sourceHash: z.string().optional(),
       manual: z.boolean().default(false),
       featured: z.boolean().default(false),

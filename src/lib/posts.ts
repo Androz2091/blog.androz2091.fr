@@ -11,13 +11,21 @@ export async function getAllPosts(): Promise<Post[]> {
   return await getCollection('blog');
 }
 
+export function isEnglishOnly(post: Post): boolean {
+  return post.data.lang === 'en' && post.data.frTitle !== undefined;
+}
+
+export function postTitle(post: Post, lang: Lang = post.data.lang): string {
+  return lang === 'fr' && isEnglishOnly(post) ? post.data.frTitle! : post.data.title;
+}
+
 export async function getPostsByLang(
   lang: Lang,
   { includeUnlisted = false }: { includeUnlisted?: boolean } = {},
 ): Promise<Post[]> {
   const all = await getAllPosts();
   return all
-    .filter((p) => p.data.lang === lang)
+    .filter((p) => p.data.lang === lang || (lang === 'fr' && isEnglishOnly(p)))
     .filter((p) => includeUnlisted || !p.data.unlisted)
     .sort((a, b) => {
       const fa = a.data.featured ? 1 : 0;
@@ -35,9 +43,9 @@ export async function findSibling(post: Post): Promise<Post | undefined> {
   );
 }
 
-export function postUrl(post: Post): string {
+export function postUrl(post: Post, lang: Lang = post.data.lang): string {
   const slug = getCanonicalSlug(post.id);
-  return post.data.lang === 'en' ? `/en/${slug}/` : `/${slug}/`;
+  return lang === 'en' ? `/en/${slug}/` : `/${slug}/`;
 }
 
 export function homeUrl(lang: Lang): string {

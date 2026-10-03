@@ -4,11 +4,13 @@ import type { Lang } from '../lib/posts';
 interface Props {
   current: Lang;
   href: string;
+  englishOnly?: boolean;
 }
 
-const { current, href } = Astro.props;
-const label =
-  current === 'en'
+const { current, href, englishOnly = false } = Astro.props;
+const label = englishOnly
+  ? "Cet article n'est disponible qu'en anglais"
+  : current === 'en'
     ? 'Automatically translated from French by an LLM — read the original'
     : 'Also available in English';
 ---

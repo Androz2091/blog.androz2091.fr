@@ -1,7 +1,14 @@
 ---
 import { Image } from 'astro:assets';
-import type { Post } from '../lib/posts';
-import { findSibling, getPostsByLang, postUrl, homeUrl } from '../lib/posts';
+import type { Lang, Post } from '../lib/posts';
+import {
+  findSibling,
+  getPostsByLang,
+  isEnglishOnly,
+  postTitle,
+  postUrl,
+  homeUrl,
+} from '../lib/posts';
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -10,16 +17,22 @@ import AlternateLangNote from '../components/AlternateLangNote.astro';
 
 interface Props {
   post: Post;
+  // The page's language, which differs from the post's on the French page of an English-only post.
+  lang?: Lang;
 }
 
-const { post } = Astro.props;
-const { title, date, image, imageAlt, excerpt, lang, unlisted } = post.data;
+const { post, lang = post.data.lang } = Astro.props;
+const { date, image, imageAlt, excerpt, unlisted } = post.data;
+const title = postTitle(post, lang);
+const englishOnly = isEnglishOnly(post);
+const englishOnlyInFrench = englishOnly && lang === 'fr';
 
 const sibling = await findSibling(post);
 const siblingHref = sibling ? postUrl(sibling) : null;
+const otherLangHref = englishOnly ? postUrl(post, lang === 'fr' ? 'en' : 'fr') : siblingHref;
 
-const frHref = lang === 'fr' ? Astro.url.pathname : siblingHref ?? homeUrl('fr');
-const enHref = lang === 'en' ? Astro.url.pathname : siblingHref ?? homeUrl('en');
+const frHref = lang === 'fr' ? Astro.url.pathname : otherLangHref ?? homeUrl('fr');
+const enHref = lang === 'en' ? Astro.url.pathname : otherLangHref ?? homeUrl('en');
 
 const samelangPosts = await getPostsByLang(lang);
 const idx = samelangPosts.findIndex((p) => p.id === post.id);
@@ -36,7 +49,7 @@ const description = excerpt ?? title;
       title={title}
       description={description}
       lang={lang}
-      noindex={unlisted}
+      noindex={unlisted || englishOnlyInFrench}
       alternate={sibling
         ? { lang: sibling.data.lang, href: new URL(siblingHref!, Astro.site).toString() }
         : null}
@@ -58,19 +71,22 @@ const description = excerpt ?? title;
         {sibling && siblingHref && (
           <AlternateLangNote current={lang} href={siblingHref} />
         )}
-        <div class="post-body">
+        {englishOnlyInFrench && otherLangHref && (
+          <AlternateLangNote current={lang} href={otherLangHref} englishOnly />
+        )}
+        <div class="post-body" lang={englishOnlyInFrench ? 'en' : undefined}>
           <slot />
         </div>
       </article>
       <nav class="post-nav" aria-label={lang === 'fr' ? 'Articles' : 'Posts'}>
         {prev && (
-          <a class="prev" href={postUrl(prev)}>
-            ← {prev.data.title}
+          <a class="prev" href={postUrl(prev, lang)}>
+            ← {postTitle(prev, lang)}
           </a>
         )}
         {next && (
-          <a class="next" href={postUrl(next)}>
-            {next.data.title} →
+          <a class="next" href={postUrl(next, lang)}>
+            {postTitle(next, lang)} →
           </a>
         )}
       </nav>
