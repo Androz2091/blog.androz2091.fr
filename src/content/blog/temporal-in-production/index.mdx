@@ -26,7 +26,7 @@ At ClarityCare AI, we process **thousands of prior authorization requests every 
 This series of steps, which we call a workflow, involves many expensive API calls to LLMs, and the entire workflow can take several minutes to complete.
 
 Given this context, using Temporal for our backend allows us to:
-- Get extreme reliability by retrying a step on its own when it fails, without losing the work done before. Transient failures (extremely common with LLMs these days) still happen, but every one of them is now retried automatically, without restarting the workflow.
+- Get extreme reliability by retrying a step on its own when it fails, without losing the work done before. Transient failures (extremely common with LLMs these days) still happen, but all of them now succeed on a retry, without restarting the workflow.
 - Get excellent visibility into what is running on our servers at any given time.
 - Scale very confidently by distributing the load across several workers and containers.
 - Handle bursts of activity from our customers by queueing workflows if we reach our infrastructure's capacity.
