@@ -1,0 +1,41 @@
+src/components/AlternateLangNote.astro
+  s_ed362270cca8e6::t_9bc7bb00fe424c 7,10-13
+src/components/FormattedDate.astro
+  s_ed362270cca8e6::t_97ee1697a7fbc6 13
+src/content.config.ts
+  s_ed362270cca8e6::t_2cd357fdf92b8a 17-19
+src/layouts/BlogPost.astro
+  s_ed362270cca8e6::t_a879aaeed260f2 74-77,83-84,88-89
+  s_ed362270cca8e6::t_a5ef5aa9c51670 52
+  s_ed362270cca8e6::t_237cc43dea9e10 3-11,20-21,24-28,32,34-35
+src/pages/index.astro
+  s_ed362270cca8e6::t_ad03197ec0533d 25-26
+  s_ed362270cca8e6::t_9a86a0906f02a3 7
+src/pages/rss.xml.js
+  s_ed362270cca8e6::t_d0a19ec098a91d 12,15
+  s_ed362270cca8e6::t_24156d79a9d883 3
+src/lib/posts.ts
+  s_ed362270cca8e6::t_9a5e72b58f0efa 14-21,28
+  s_ed362270cca8e6::t_e6006518b5d936 46,48
+src/content/blog/temporal-in-production/index.mdx
+  s_ed362270cca8e6::t_1abc867b1521dc 7
+  s_ed362270cca8e6::t_81aa7fd5f26601 6
+src/pages/[...slug].astro
+  s_ed362270cca8e6::t_fbea3363f9ddca 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "773734357b6e502f8933a7a367be7da25acf0c6c",
+  "prompts": {},
+  "sessions": {
+    "s_ed362270cca8e6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9b057f8a-aa4a-4187-9c59-af13c8625c13",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "androz2091 <androz2091@gmail.com>"
+    }
+  }
+}
