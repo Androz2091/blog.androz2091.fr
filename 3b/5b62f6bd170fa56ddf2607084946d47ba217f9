@@ -1,0 +1,24 @@
+src/content/blog/temporal-in-production/index.mdx
+  s_ed362270cca8e6::t_4411e857ed9125 75-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "3b5b62f6bd170fa56ddf2607084946d47ba217f9",
+  "prompts": {},
+  "humans": {
+    "h_975f987b1ad57e": {
+      "author": "androz2091 <androz2091@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_ed362270cca8e6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9b057f8a-aa4a-4187-9c59-af13c8625c13",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "androz2091 <androz2091@gmail.com>"
+    }
+  }
+}
