@@ -72,9 +72,10 @@ When we schedule a workflow:
 
 <Callout>
 What I've heard a lot, make sure it's clear for you:
-- a workflow does **not** run continuously. Between two activities, it holds no thread at all.
-- unless the workflow is cached, it does **not** magically resume "at the right place" when an activity completes. The whole workflow runs again from scratch, and the activity calls that already completed return their recorded result instead of running again.
-- when it is cached, the worker kept it in memory, and it really is like an async function that only resolves when the activity is done.
+- a workflow does **not** run continuously. Its code only runs in short bursts, each one until it reaches an activity that hasn't finished. In between, no thread is running it and it holds no slot. What keeps it alive is its history, stored on Temporal's server.
+- when an activity completes, the workflow continues in one of two ways:
+  - **the worker still has it in memory** (it's cached): the code picks up exactly where it stopped, like an `await` that finally resolves.
+  - **the worker doesn't have it anymore** (after a deploy, a crash, or to free memory): any worker runs the workflow again from the top. Every activity that already completed returns its recorded result instantly, so the code quickly gets back to where it stopped.
 - you can't know which of the two will happen, and that's why workflows must be deterministic: the same workflow execution can run dozens of times and must always take the same path. See the gray blocks below.
 </Callout>
 
